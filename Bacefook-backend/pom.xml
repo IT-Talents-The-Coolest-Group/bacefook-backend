@@ -10,23 +10,14 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.bacefook</groupId>
-	<artifactId>Bacefook</artifactId>
+	<artifactId>Bacefook-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Bacefook</name>
-	<description>Final project by IT Talents</description>
+	<name>Bacefook-backend</name>
+	<description>Final project for It talents</description>
 
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 	<dependencies>
 		<dependency>
@@ -52,7 +43,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -63,7 +53,15 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
 		</dependency>
-
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
