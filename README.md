@@ -1,3 +1,5 @@
-# bacefook-backend
- 
-This is our final group project, assigned by **IT Talents**, on the website [facebook.com](https://www.facebook.com/).
+# Bacefook
+
+This is the final assignment from [IT Talents](https://ittalents.bg/home), to recreate the back end of [Facebook](https://facebook.com).
+
+Hosted at [bacefookapi.herokuapp.com](http://bacefookapi.herokuapp.com).
