@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp target\classes\com\bacefook\BacefookBackendApplication.class
+web: java $JAVA_OPTS -cp target/classes:target/dependency/* BacefookBackendApplication.class
