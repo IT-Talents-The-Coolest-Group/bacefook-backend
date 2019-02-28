@@ -1,1 +1,1 @@
-web: java -cp target/classes:target/dependency/* com.bacefook.BacefookBackendApplication
+web: java -cp -Dspring.server.port=$PORT target/classes:target/dependency/* com.bacefook.BacefookBackendApplication
