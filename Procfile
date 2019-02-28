@@ -1,1 +1,1 @@
-web: java --server.port=8090 -cp target/classes:target/dependency/* com.bacefook.BacefookBackendApplication
+web: java -cp target/classes:target/dependency/* com.bacefook.BacefookBackendApplication
