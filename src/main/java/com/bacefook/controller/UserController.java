@@ -1,11 +1,13 @@
 package com.bacefook.controller;
 
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bacefook.exceptions.UserNotFoundException;
 import com.bacefook.model.User;
 import com.bacefook.service.UserService;
 
@@ -15,10 +17,20 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@GetMapping("/users")
-	public List<User> getAllUsers() {
-		return userService.getAllUsers();
-	}
+	// TODO change this to return a DTO
+		@GetMapping("{id}/friends")
+		public Set<User> getFriendsOfUser(@PathVariable Integer id) throws UserNotFoundException {
+			return userService.findUserById(id).getFriends();
+		}
 	
+	// TODO create a user/sign up
+	
+	// TODO send a friend request to a user
+	// should create a new relation with the two users
+	
+	// TODO accept a friend request of a user
+	// should change the relation column 'is_confirmed' to 1
+
+	// TODO get all posts of a specific user
 	
 }
