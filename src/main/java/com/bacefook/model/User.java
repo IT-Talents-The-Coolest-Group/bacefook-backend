@@ -7,25 +7,23 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
+@Data
 @Entity
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="users")
+@Table(name = "users")
 public class User {
 	@Id
-	private int id;
+	private Integer id;
+	
+	private int genderId;
 	private String email;
-	private String password;
+	
 	private String firstName;
 	private String lastName;
+	private String password;
 	private LocalDate birthday;
-	private int gender;
 }
