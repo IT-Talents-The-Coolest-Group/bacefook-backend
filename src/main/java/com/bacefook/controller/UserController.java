@@ -1,26 +1,34 @@
 package com.bacefook.controller;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bacefook.dto.FriendsListDTO;
 import com.bacefook.exceptions.UserNotFoundException;
-import com.bacefook.model.User;
 import com.bacefook.service.UserService;
 
 @RestController
 public class UserController {
 	
-	@Autowired
-	private UserService userService;
+	@Autowired private UserService userService;
 	
-	// TODO change this to return a DTO
 		@GetMapping("{id}/friends")
-		public Set<User> getFriendsOfUser(@PathVariable Integer id) throws UserNotFoundException {
-			return userService.findUserById(id).getFriends();
+		public Set<FriendsListDTO> getFriendsOfUser(@PathVariable Integer id) 
+				throws UserNotFoundException {
+			return userService
+					.findUserById(id).getFriends()
+					.stream().map(user -> 
+					new FriendsListDTO(
+						user.getId(), 
+						user.getFirstName(), 
+						user.getLastName(), 
+						user.getFriends().size()))
+					.collect(Collectors.toSet());
 		}
 	
 	// TODO create a user/sign up
