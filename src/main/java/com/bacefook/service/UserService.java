@@ -20,6 +20,7 @@ public class UserService {
 	private RelationsRepository relationsRepo;
 	
 	public User findUserByEmail(String email) {
+		System.out.println("users repo: "+usersRepo);
 		return usersRepo.findByEmail(email);
 	}
 	
@@ -40,14 +41,5 @@ public class UserService {
 		usersRepo.save(new User());
 		relationsRepo.save(new Relation(senderId, receiverId)); // TODO fix this
 	}
-	
-<<<<<<< HEAD
-	
-=======
-	public User findUserByEmail(String email) {
-		System.out.println("users repo "+ usersRepo);
-		return usersRepo.findByEmail(email);
-	}
->>>>>>> 232e66c0cb093dd76d7d34a8c8fa0c4088a38667
 	
 }

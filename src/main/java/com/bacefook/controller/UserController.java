@@ -33,8 +33,8 @@ public class UserController {
 		String email = signUp.getEmail();
 		if (UserValidation.isValidEmail(email)
 				&& UserValidation.isValidPassword(signUp.getPassword(), signUp.getPasswordConfirmation())
-				&& UserValidation.isValidBirthday(signUp.getBirthday())
-				&& UserValidation.isValidGender(signUp.getGender())) {
+				&& UserValidation.isValidBirthday(signUp.getBirthday())) {
+//				&& UserValidation.isValidGender(signUp.getGender())) {
 			if (signUp.getFirstName().isEmpty()) {
 				throw new InvalidUserException("Wrong sign up credentials!");
 			}
