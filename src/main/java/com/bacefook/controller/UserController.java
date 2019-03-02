@@ -48,8 +48,8 @@ public class UserController {
 			}
 //			if(signUp.getGender().isEmpty())
 			// TODO gender
-			User user = new User(null, 1, email, signUp.getFirstName(), signUp.getLastName(), signUp.getEmail(),
-					signUp.getBirthday());
+			User user = new User(null, 1, email, signUp.getFirstName(), signUp.getLastName(), signUp.getPassword(),
+					signUp.getBirthday(), null);
 			// TODO save to DB
 			// TODO setID
 
@@ -72,4 +72,4 @@ public class UserController {
 
 	// TODO get all posts of a specific user
 
-}
+};
