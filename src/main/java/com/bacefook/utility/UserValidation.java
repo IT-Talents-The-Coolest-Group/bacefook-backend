@@ -6,6 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bacefook.exception.InvalidUserException;
+import com.bacefook.model.Gender;
+import com.bacefook.service.GenderService;
 
 public class UserValidation {
 	private static final int MAX_AGE = 120;
@@ -45,5 +47,16 @@ public class UserValidation {
 			throw new InvalidUserException("Wrong sign up credentials!");
 		}
 		return true;
+	}
+
+	public static boolean isValidGender(String gender) throws InvalidUserException {
+		if (gender != null) {
+			GenderService gs = new GenderService();
+			Gender g = gs.findByGenderName(gender);
+			if (g != null) {
+				return true;
+			}
+		}
+		throw new InvalidUserException("Wrong login credentials!");
 	}
 }
