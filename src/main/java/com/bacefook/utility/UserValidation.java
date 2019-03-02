@@ -11,8 +11,8 @@ public class UserValidation {
 	private static final int MAX_AGE = 120;
 	private static final int MIN_AGE = 12;
 	private final static Pattern EMAIL_PATTERN = Pattern
-			.compile("^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,3}$");
-	private final static Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9]{3,14}$");
+			.compile("^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,5}$");
+	private final static Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9]{8,30}$");
 
 	public static boolean isValidEmail(String email) throws InvalidUserException {
 		if (email != null) {
