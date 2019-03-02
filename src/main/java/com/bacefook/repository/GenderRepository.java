@@ -1,4 +1,4 @@
-package com.bacefook.dao;
+package com.bacefook.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

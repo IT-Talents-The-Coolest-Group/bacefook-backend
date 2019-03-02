@@ -38,8 +38,7 @@ public class User {
 	@NonNull private LocalDate birthday;
 	
 	/* Makes sure that UserRepository gets all friends
-	 * of this user from the 'relations' table
-	 */
+	 * of this user from the 'relations' table */
 	@ManyToMany(
 		fetch = FetchType.LAZY,
 		cascade = { CascadeType.PERSIST, CascadeType.MERGE })

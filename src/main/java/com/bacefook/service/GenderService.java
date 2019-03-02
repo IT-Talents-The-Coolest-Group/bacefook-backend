@@ -5,9 +5,9 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bacefook.dao.GenderRepository;
 import com.bacefook.exception.GenderNotFoundException;
 import com.bacefook.model.Gender;
+import com.bacefook.repository.GenderRepository;
 
 @Service
 public class GenderService {

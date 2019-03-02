@@ -5,11 +5,11 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bacefook.dao.RelationsRepository;
-import com.bacefook.dao.UsersRepository;
 import com.bacefook.exception.UserNotFoundException;
 import com.bacefook.model.Relation;
 import com.bacefook.model.User;
+import com.bacefook.repository.RelationsRepository;
+import com.bacefook.repository.UsersRepository;
 
 @Service
 public class UserService {
@@ -32,7 +32,11 @@ public class UserService {
 	
 	public void makeRelation(Integer senderId, Integer receiverId) {
 		usersRepo.save(new User());
-		//relationsRepo.save(new Relation(null, senderId, receiverId)); // TODO fix this
+		relationsRepo.save(new Relation(senderId, receiverId)); // TODO fix this
+	}
+	
+	public User findUserByEmail(String email) {
+		return usersRepo.findByEmail(email);
 	}
 	
 }
