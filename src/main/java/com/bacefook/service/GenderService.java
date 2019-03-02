@@ -16,7 +16,7 @@ public class GenderService {
 	
 	public String findGenderById(Integer id) throws GenderNotFoundException {
 		try {
-			return genderRepo.findById(id).get();
+			return genderRepo.findById(id).get().getGender();
 		}
 		catch (NoSuchElementException e) {
 			throw new GenderNotFoundException("Could not find a gender with that id!", e);
