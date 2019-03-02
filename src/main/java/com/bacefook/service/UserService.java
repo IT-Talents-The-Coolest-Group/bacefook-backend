@@ -17,6 +17,10 @@ public class UserService {
 	@Autowired private UsersRepository usersRepo;
 	@Autowired private RelationsRepository relationsRepo;
 	
+	public User findUserByEmail(String email) {
+		return usersRepo.findByEmail(email);
+	}
+	
 	public User findUserById(Integer id) throws UserNotFoundException {
 		try {
 			return usersRepo.findById(id).get();
@@ -35,8 +39,6 @@ public class UserService {
 		relationsRepo.save(new Relation(senderId, receiverId)); // TODO fix this
 	}
 	
-	public User findUserByEmail(String email) {
-		return usersRepo.findByEmail(email);
-	}
+	
 	
 }

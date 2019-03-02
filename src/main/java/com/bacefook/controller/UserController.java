@@ -28,6 +28,11 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	@GetMapping("email/{email}")
+	public String findUserByEmail(@PathVariable String email) {
+		return userService.findUserByEmail(email).getEmail();
+	}
 
 	@GetMapping("{id}/friends")
 	public Set<FriendsListDTO> getFriendsOfUser(@PathVariable Integer id) throws UserNotFoundException {
