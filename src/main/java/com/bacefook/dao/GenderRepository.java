@@ -8,5 +8,5 @@ import com.bacefook.model.Gender;
 
 @Repository
 public interface GenderRepository extends JpaRepository<Gender, Integer> {
-
+	public Gender findByGenderName(String genderName);
 }
