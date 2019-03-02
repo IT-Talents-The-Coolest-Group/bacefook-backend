@@ -15,14 +15,12 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.WhereJoinTable;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class User {
 	
