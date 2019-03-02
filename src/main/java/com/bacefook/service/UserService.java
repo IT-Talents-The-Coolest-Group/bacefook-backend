@@ -26,6 +26,10 @@ public class UserService {
 		}
 	}
 	
+	public Integer saveUser(User user) {
+		return usersRepo.save(user).getId();
+	}
+	
 	public void makeRelation(Integer senderId, Integer receiverId) {
 		usersRepo.save(new User());
 		//relationsRepo.save(new Relation(null, senderId, receiverId)); // TODO fix this

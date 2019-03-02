@@ -6,33 +6,36 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.WhereJoinTable;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
+@RequiredArgsConstructor
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class User {
-	
-	@Id private Integer id;
-	@NotNull private int genderId;
-	@NotNull private String email;
-	@NotNull private String firstName;
-	@NotNull private String lastName;
-	@NotNull private String password;
-	@NotNull private LocalDate birthday;
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY) 
+	private Integer id;
+	@NonNull private Integer genderId;
+	@NonNull private String email;
+	@NonNull private String firstName;
+	@NonNull private String lastName;
+	@NonNull private String password;
+	@NonNull private LocalDate birthday;
 	
 	/* Makes sure that UserRepository gets all friends
 	 * of this user from the 'relations' table

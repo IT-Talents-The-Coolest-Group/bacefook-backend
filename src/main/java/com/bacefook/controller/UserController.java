@@ -37,7 +37,7 @@ public class UserController {
 
 	// TODO create a user/sign up
 	@PostMapping("signup")
-	public void signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request) throws InvalidUserException {
+	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request) throws InvalidUserException {
 		String email = signUp.getEmail();
 		if (UserValidation.isValidEmail(email)
 				&& UserValidation.isValidPassword(signUp.getPassword(), signUp.getPasswordConfirmation())
@@ -50,14 +50,15 @@ public class UserController {
 			}
 //			if(signUp.getGender().isEmpty())
 			// TODO gender
-			User user = new User(null, 1, email, signUp.getFirstName(), signUp.getLastName(), signUp.getPassword(),
-					signUp.getBirthday(), null);
-			// TODO save to DB
-			// TODO setID
-
+			User user = new User(1, email, signUp.getFirstName(), signUp.getLastName(), signUp.getPassword(),
+					signUp.getBirthday());
+			
 			SessionManager.signInUser(request, user);// Session is set to logged
 			System.out.println(user);
+			
+			return userService.saveUser(user);
 		}
+		throw new InvalidUserException("Wrong login credentials!");
 	}
 
 	// TODO implement
