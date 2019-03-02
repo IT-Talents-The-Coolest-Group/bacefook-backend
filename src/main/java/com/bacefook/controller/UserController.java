@@ -41,21 +41,19 @@ public class UserController {
 		String email = signUp.getEmail();
 		if (UserValidation.isValidEmail(email)
 				&& UserValidation.isValidPassword(signUp.getPassword(), signUp.getPasswordConfirmation())
-				&& UserValidation.isValidBirthday(signUp.getBirthday())) {
+				&& UserValidation.isValidBirthday(signUp.getBirthday())&&UserValidation.isValidGender(signUp.getGender())) {
 			if (signUp.getFirstName().isEmpty()) {
 				throw new InvalidUserException("Wrong login credentials!");
 			}
 			if (signUp.getLastName().isEmpty()) {
 				throw new InvalidUserException("Wrong login credentials!");
 			}
-//			if(signUp.getGender().isEmpty())
-			// TODO gender
 			User user = new User(1, email, signUp.getFirstName(), signUp.getLastName(), signUp.getPassword(),
 					signUp.getBirthday());
-			
+
 			SessionManager.signInUser(request, user);// Session is set to logged
 			System.out.println(user);
-			
+
 			return userService.saveUser(user);
 		}
 		throw new InvalidUserException("Wrong login credentials!");
@@ -72,9 +70,9 @@ public class UserController {
 	@PutMapping("{id}/friendrequest")
 	public void sendFriendRequest(@RequestParam Integer id) {
 		User u = new User();
-		//userService.makeRelation(u, id); // TODO fix this
+		// userService.makeRelation(u, id); // TODO fix this
 	}
-	
+
 	// TODO accept a friend request of a user
 	// should change the relation column 'is_confirmed' to 1
 
