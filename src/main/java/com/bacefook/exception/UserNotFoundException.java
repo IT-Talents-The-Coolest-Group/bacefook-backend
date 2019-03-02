@@ -1,4 +1,4 @@
-package com.bacefook.exceptions;
+package com.bacefook.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

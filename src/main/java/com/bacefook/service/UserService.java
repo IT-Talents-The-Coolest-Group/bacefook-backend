@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bacefook.dao.UsersRepository;
-import com.bacefook.exceptions.UserNotFoundException;
+import com.bacefook.exception.UserNotFoundException;
 import com.bacefook.model.User;
 
 @Service
