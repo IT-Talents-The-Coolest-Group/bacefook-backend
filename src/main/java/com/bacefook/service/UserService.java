@@ -14,8 +14,10 @@ import com.bacefook.repository.UsersRepository;
 @Service
 public class UserService {
 
-	@Autowired private UsersRepository usersRepo;
-	@Autowired private RelationsRepository relationsRepo;
+	@Autowired 
+	private UsersRepository usersRepo;
+	@Autowired 
+	private RelationsRepository relationsRepo;
 	
 	public User findUserById(Integer id) throws UserNotFoundException {
 		try {
@@ -36,6 +38,7 @@ public class UserService {
 	}
 	
 	public User findUserByEmail(String email) {
+		System.out.println("users repo "+ usersRepo);
 		return usersRepo.findByEmail(email);
 	}
 	
