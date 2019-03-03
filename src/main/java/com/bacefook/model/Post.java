@@ -24,7 +24,7 @@ public class Post {
 	@NonNull
 	private Integer posterId;
 	@NonNull
-	private Post sharesPostId;
+	private Integer sharesPostId;
 	@NonNull
 	private String content;
 	@NonNull

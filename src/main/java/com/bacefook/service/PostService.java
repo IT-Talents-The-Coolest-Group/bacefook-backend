@@ -15,7 +15,7 @@ public class PostService {
 	private PostsRepository postsRepo;
 	
 	public List<Post> findAllPostsByUser(User poster) {
-		return postsRepo.findAllByUserId(poster.getId());
+		return postsRepo.findAllByPosterId(poster.getId());
 	}
 	
 	public void savePost(Post post) {

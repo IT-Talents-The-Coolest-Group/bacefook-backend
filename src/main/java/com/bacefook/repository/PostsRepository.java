@@ -9,5 +9,5 @@ import com.bacefook.model.Post;
 
 @Repository
 public interface PostsRepository extends JpaRepository<Post, Integer> {
-	public List<Post> findAllByUserId(Integer posterId);
+	public List<Post> findAllByPosterId(Integer posterId);
 }
