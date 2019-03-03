@@ -15,8 +15,10 @@ import lombok.NonNull;
 @NoArgsConstructor
 @Table(name = "genders")
 public class Gender {
-	
+
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id private Integer id;
-	@NonNull private String genderName;
+	private Integer id;
+	@NonNull
+	private String genderName;
 }

@@ -27,16 +27,23 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
-	
-	@GeneratedValue(strategy = GenerationType.IDENTITY) 
-	@Id private Integer id;
-	@NonNull private Integer genderId;
-	@NonNull private String email;
-	@NonNull private String firstName;
-	@NonNull private String lastName;
-	@NonNull private String password;
-	@NonNull private LocalDate birthday;
-	
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	@NonNull
+	private Integer genderId;
+	@NonNull
+	private String email;
+	@NonNull
+	private String firstName;
+	@NonNull
+	private String lastName;
+	@NonNull
+	private String password;
+	@NonNull
+	private LocalDate birthday;
+
 	/* Makes sure that UserRepository gets all friends
 	 * of this user from the 'relations' table */
 	@ManyToMany(

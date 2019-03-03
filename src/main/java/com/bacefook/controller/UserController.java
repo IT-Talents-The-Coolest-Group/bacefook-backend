@@ -20,8 +20,10 @@ import com.bacefook.utility.UserValidation;
 @RestController
 public class UserController {
 
-	@Autowired private UserService userService;
-	@Autowired private GenderService genderService;
+	@Autowired 
+	private UserService userService;
+	@Autowired 
+	private GenderService genderService;
 
 	@PostMapping("signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request) 
@@ -56,6 +58,5 @@ public class UserController {
 		}
 	}
 
-	// TODO get all posts of a specific user - should probably be in a posts controller class
 
 };

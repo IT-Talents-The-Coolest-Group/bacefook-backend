@@ -17,14 +17,17 @@ import lombok.NonNull;
 @NoArgsConstructor
 @Table(name = "posts")
 public class Post {
-	
+
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id private Integer id;
-	
-	// TODO figure out how to deal with these FK's
-	//private User poster;
-	//private Post sharesPost;
-	@NonNull private String content;
-	@NonNull private LocalDate postingTime;
-	
+	private Integer id;
+	@NonNull
+	private Integer posterId;
+	@NonNull
+	private Post sharesPostId;
+	@NonNull
+	private String content;
+	@NonNull
+	private LocalDate postingTime;
+
 }

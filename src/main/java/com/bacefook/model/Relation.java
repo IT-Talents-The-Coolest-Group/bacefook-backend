@@ -17,9 +17,12 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @Table(name = "relations")
 public class Relation {
-	
+
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id private Integer id;
-	@NonNull private Integer senderId;
-	@NonNull private Integer receiverId;
+	private Integer id;
+	@NonNull
+	private Integer senderId;
+	@NonNull
+	private Integer receiverId;
 }
