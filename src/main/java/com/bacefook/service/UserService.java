@@ -42,5 +42,4 @@ public class UserService {
 //		relationsRepo.save(new Relation(senderId, receiverId)); // TODO fix this
 	}
 	
-	
 }
