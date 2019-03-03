@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -33,7 +34,7 @@ public class User {
 	private Integer id;
 	@NonNull
 	private Integer genderId;
-	@NonNull
+	@NonNull @Column(unique=true, nullable = false)
 	private String email;
 	@NonNull
 	private String firstName;
