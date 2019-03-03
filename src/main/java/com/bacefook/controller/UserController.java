@@ -5,9 +5,11 @@ import java.security.NoSuchAlgorithmException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.ChangePasswordDTO;
@@ -70,7 +72,7 @@ public class UserController extends BaseController {
 		return userService.saveUser(user);
 	}
 
-	@PostMapping("login")
+	@PostMapping("/login")
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException {
 		UserValidation validation = new UserValidation();
@@ -81,10 +83,15 @@ public class UserController extends BaseController {
 				SessionManager.signInUser(request, user);
 				return user.getId();
 			} else {
-				throw new InvalidUserCredentialsException("Credentials do not match!");
+ 				throw new InvalidUserCredentialsException("Credentials do not match!");
 			}
 		} catch (UserNotFoundException e) {
 			throw new InvalidUserCredentialsException("Credentials do not match!");
 		}
+	}
+	
+	@GetMapping("/users/{id}/logout")
+	public void logout(@PathVariable("id")int id,HttpServletRequest request) {
+		SessionManager.logOutUser(request);
 	}
 }
