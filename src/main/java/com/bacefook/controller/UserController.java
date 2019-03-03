@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.ChangePasswordDTO;
@@ -17,6 +16,7 @@ import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
 import com.bacefook.exception.GenderNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
+import com.bacefook.exception.UserExistsException;
 import com.bacefook.exception.UserNotFoundException;
 import com.bacefook.exception.UserNotLoggedException;
 import com.bacefook.model.User;
@@ -58,14 +58,25 @@ public class UserController extends BaseController {
 
 	@PostMapping("/signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
-			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException {
+			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException,
+			UserExistsException {
 
 		new UserValidation().validate(signUp);
 
 		Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
+		User user = null;
+		try {
+			user = userService.findUserByEmail(signUp.getEmail());
+		} catch (UserNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (user != null) {
+			throw new UserExistsException("User with that email already exists!");
+		}
 		String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
 
-		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(), encodedPassword,
+		user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(), encodedPassword,
 				signUp.getBirthday());
 
 		SessionManager.signInUser(request, user);
@@ -83,15 +94,18 @@ public class UserController extends BaseController {
 				SessionManager.signInUser(request, user);
 				return user.getId();
 			} else {
- 				throw new InvalidUserCredentialsException("Credentials do not match!");
+				throw new InvalidUserCredentialsException("Credentials do not match!");
 			}
 		} catch (UserNotFoundException e) {
 			throw new InvalidUserCredentialsException("Credentials do not match!");
 		}
 	}
-	
+
 	@GetMapping("/users/{id}/logout")
-	public void logout(@PathVariable("id")int id,HttpServletRequest request) {
-		SessionManager.logOutUser(request);
+	public void logout(@PathVariable("id") int id, HttpServletRequest request) throws UserNotLoggedException {
+		if (SessionManager.isLogged(request)) {
+			SessionManager.logOutUser(request);
+		}
+		throw new UserNotLoggedException("User is not logged!");
 	}
 }
