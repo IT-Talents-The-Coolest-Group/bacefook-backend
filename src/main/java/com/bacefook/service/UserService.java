@@ -14,9 +14,8 @@ public class UserService {
 
 	@Autowired 
 	private UsersRepository usersRepo;
-	
-	 @Autowired 
-	 private RelationsRepository relationsRepo;
+	@Autowired 
+	private RelationsRepository relationsRepo;
 	
 	public User findUserByEmail(String email) throws UserNotFoundException {
 		User user = usersRepo.findByEmail(email);
