@@ -15,7 +15,7 @@ import com.bacefook.exception.UserNotFoundException;
 import com.bacefook.service.UserService;
 
 @RestController
-public class FriendsController {
+public class RelationsController {
 	@Autowired
 	private UserService userService;
 
@@ -29,9 +29,7 @@ public class FriendsController {
 	// TODO send a friend request to a user
 	// should create a new relation with the two users
 	@PutMapping("{id}/friendrequest")
-	public void sendFriendRequest(@RequestParam Integer id) {
-		// User u = new User();
-		// userService.makeRelation(u, id); // TODO fix this
+	public void sendFriendRequest(@PathVariable Integer id) {
 	}
 
 	// TODO accept a friend request of a user

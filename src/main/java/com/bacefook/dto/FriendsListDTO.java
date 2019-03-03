@@ -9,7 +9,7 @@ public class FriendsListDTO {
 	@NonNull private Integer id;
 	@NonNull private String firstName;
 	@NonNull private String lastName;
-	@NonNull private int size;
+	@NonNull private int friendsCount;
 	
 
 }

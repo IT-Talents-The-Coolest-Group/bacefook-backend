@@ -45,7 +45,8 @@ public class UserController extends BaseController {
 	}
 
 	@PostMapping("login")
-	public int login(@RequestBody LoginDTO login, HttpServletRequest request) throws InvalidUserCredentialsException, NoSuchAlgorithmException {
+	public int login(@RequestBody LoginDTO login, HttpServletRequest request)
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException {
 		UserValidation validation = new UserValidation();
 		validation.validate(login);
 		try {
