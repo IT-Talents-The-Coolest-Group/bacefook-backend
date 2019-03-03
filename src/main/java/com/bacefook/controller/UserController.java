@@ -44,8 +44,7 @@ public class UserController {
 	@PostMapping("login")
 	public int login(@RequestBody LoginDTO login, HttpServletRequest request) throws InvalidUserCredentialsException {
 		
-		UserValidation validation = new UserValidation();
-		validation.validate(login);
+		new UserValidation().validate(login);
 		try {
 			User user = userService.findUserByEmail(login.getEmail());
 			// passEncoder.matches(login.getPassword(), user.getPassword()); // TODO
@@ -57,6 +56,4 @@ public class UserController {
 			throw new InvalidUserCredentialsException("Credentials do not match!");
 		}
 	}
-
-
-};
+}
