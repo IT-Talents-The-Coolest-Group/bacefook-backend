@@ -21,7 +21,7 @@ public class UserValidation {
 		}
 	}
 
-	private void validatePassword(String pass1) throws InvalidUserCredentialsException {
+	public void validatePassword(String pass1) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(pass1) || !pass1.matches(PASSWORD_PATTERN)) {
 			throw new InvalidUserCredentialsException("Invalid password, must only contain latin letters and numbers");
 		}
