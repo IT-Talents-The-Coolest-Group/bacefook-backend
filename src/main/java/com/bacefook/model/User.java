@@ -27,9 +27,9 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
-	@Id 
+	
 	@GeneratedValue(strategy = GenerationType.IDENTITY) 
-	private Integer id;
+	@Id private Integer id;
 	@NonNull private Integer genderId;
 	@NonNull private String email;
 	@NonNull private String firstName;
@@ -49,6 +49,5 @@ public class User {
 	@WhereJoinTable( 
 		clause = "is_confirmed = 1")
 	private Set<User> friends;
-	
-	
+
 }

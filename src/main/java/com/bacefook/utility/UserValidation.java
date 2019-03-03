@@ -2,61 +2,80 @@ package com.bacefook.utility;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import com.bacefook.exception.InvalidUserException;
-import com.bacefook.model.Gender;
-import com.bacefook.service.GenderService;
+import com.bacefook.dto.LoginDTO;
+import com.bacefook.dto.SignUpDTO;
+import com.bacefook.exception.InvalidUserCredentialsException;
 
 public class UserValidation {
-	private static final int MAX_AGE = 120;
+
+	private static final int MIN_NAMES_LENGTH = 3;
 	private static final int MIN_AGE = 12;
-	private final static Pattern EMAIL_PATTERN = Pattern
-			.compile("^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,5}$");
-	private final static Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9]{8,30}$");
+	private static final int MAX_AGE = 120;
+	private final static String EMAIL_PATTERN = "^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,5}$";
+	private final static String PASSWORD_PATTERN = "^[a-zA-Z0-9]{8,30}$";
 
-	public static boolean isValidEmail(String email) throws InvalidUserException {
-		if (email != null) {
-			Matcher regMatcher = EMAIL_PATTERN.matcher(email);
-			if (regMatcher.matches()) {
-				return true;
-			}
+	
+	
+	
+	private void validateEmail(String email) throws InvalidUserCredentialsException {
+		if (isNullOrEmpty(email) || !email.matches(EMAIL_PATTERN)) {
+			throw new InvalidUserCredentialsException("Invalid email format!");
 		}
-		throw new InvalidUserException("Wrong sign up credentials!");
 	}
 
-	public static boolean isValidPassword(String pass1, String pass2) throws InvalidUserException {
-		if (pass1 != null && pass2 != null) {
-			Matcher passMatcher = PASSWORD_PATTERN.matcher(pass1);
-			if (passMatcher.matches()) {
-				if (pass1.equals(pass2)) {
-					return true;
-				}
-			}
+	private void validatePassword(String pass1) throws InvalidUserCredentialsException {
+		if (isNullOrEmpty(pass1) || !pass1.matches(PASSWORD_PATTERN)) {
+			throw new InvalidUserCredentialsException("Invalid password, must only contain latin letters and numbers");
 		}
-		throw new InvalidUserException("Wrong sign up credentials");
 	}
 
-	public static boolean isValidBirthday(LocalDate birthday) throws InvalidUserException {
-//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//		// convert String to LocalDate
-//		LocalDate birthday = LocalDate.parse(localDate, formatter);
+	private void validateBirthday(LocalDate birthday) throws InvalidUserCredentialsException {
 		Period period = Period.between(birthday, LocalDate.now());
 		if (period.getYears() >= MAX_AGE && period.getYears() < MIN_AGE) {
-			throw new InvalidUserException("Wrong sign up credentials!");
+			throw new InvalidUserCredentialsException(
+					"Invalid birth date, must be older than " + MIN_AGE + 
+					" and younger than "+ MAX_AGE + "!");
 		}
-		return true;
+	}
+	
+	public void confirmPassword(String password, String passwordConfirmation) throws InvalidUserCredentialsException {
+		if (isNullOrEmpty(password) || !password.equals(passwordConfirmation)) {
+			throw new InvalidUserCredentialsException("Credentials do not match!");
+		}
+	}
+	
+	private void validateName(String name) throws InvalidUserCredentialsException {
+		if (isNullOrEmpty(name) || name.length() < MIN_NAMES_LENGTH) {
+			throw new InvalidUserCredentialsException("Invalid name, must be longer than " + MIN_NAMES_LENGTH + "!");
+		}
+	}
+	
+	private boolean isNullOrEmpty(String string) {
+		return string == null || string.isEmpty();
 	}
 
-	public static boolean isValidGender(String gender) throws InvalidUserException {
-		if (gender != null) {
-			GenderService gs = new GenderService();
-			Gender g = gs.findByGenderName(gender);
-			if (g != null) {
-				return true;
-			}
-		}
-		throw new InvalidUserException("Wrong login credentials!");
+	
+	public void validate(SignUpDTO signUp) throws InvalidUserCredentialsException {
+		validateEmail(signUp.getEmail());
+		validatePassword(signUp.getPassword());
+		confirmPassword(signUp.getPassword(), signUp.getPasswordConfirmation());
+		validateBirthday(signUp.getBirthday());
+		validateName(signUp.getFirstName());
+		validateName(signUp.getLastName());
 	}
+	
+	public void validate(LoginDTO login) throws InvalidUserCredentialsException {
+		if (isNullOrEmpty(login.getEmail())) {
+			throw new InvalidUserCredentialsException("Email must not be empty!");
+		}
+		
+		if (isNullOrEmpty(login.getPassword())) {
+			throw new InvalidUserCredentialsException("Password must not be empty!");
+		}
+	}
+
+	
+
+	
 }

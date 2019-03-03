@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.FriendsListDTO;
 import com.bacefook.exception.UserNotFoundException;
-import com.bacefook.model.User;
 import com.bacefook.service.UserService;
 
 @RestController
@@ -22,14 +21,16 @@ public class FriendsController {
 
 	@GetMapping("{id}/friends")
 	public Set<FriendsListDTO> getFriendsOfUser(@PathVariable Integer id) throws UserNotFoundException {
-		return userService.findUserById(id).getFriends().stream().map(user -> new FriendsListDTO(user.getId(),
-				user.getFirstName(), user.getLastName(), user.getFriends().size())).collect(Collectors.toSet());
+		return userService.findUserById(id).getFriends().stream().map(
+				user -> new FriendsListDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getFriends().size()))
+				.collect(Collectors.toSet());
 	}
+	
 	// TODO send a friend request to a user
 	// should create a new relation with the two users
 	@PutMapping("{id}/friendrequest")
 	public void sendFriendRequest(@RequestParam Integer id) {
-		User u = new User();
+		// User u = new User();
 		// userService.makeRelation(u, id); // TODO fix this
 	}
 

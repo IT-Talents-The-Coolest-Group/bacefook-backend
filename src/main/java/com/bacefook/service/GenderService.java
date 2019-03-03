@@ -1,7 +1,5 @@
 package com.bacefook.service;
 
-import java.util.NoSuchElementException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +14,19 @@ public class GenderService {
 	private GenderRepository genderRepo;
 	
 	public String findGenderById(Integer id) throws GenderNotFoundException {
-		try {
-			return genderRepo.findById(id).get().getGenderName();
+		Gender gender = genderRepo.findById(id).get();
+		if (gender == null) {
+			throw new GenderNotFoundException("A gender with that id does not exist!");
 		}
-		catch (NoSuchElementException e) {
-			throw new GenderNotFoundException("Could not find a gender with that id!", e);
-		}
+		return gender.getGenderName();
 	}
 	
-	public Gender findByGenderName(String gender) {
-		return genderRepo.findByGenderName(gender);
+	public Gender findByGenderName(String genderName) throws GenderNotFoundException {
+		Gender gender = genderRepo.findByGenderName(genderName);
+		if (gender == null) {
+			throw new GenderNotFoundException("A gender with that name does not exist!");
+		}
+		return gender;
 	}
 	
 }
