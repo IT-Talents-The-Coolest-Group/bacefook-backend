@@ -1,61 +1,97 @@
 package com.bacefook.controller;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.security.NoSuchAlgorithmException;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bacefook.dto.FriendsListDTO;
-import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
+import com.bacefook.dto.SignUpDTO;
+import com.bacefook.exception.GenderNotFoundException;
+import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UserNotFoundException;
+import com.bacefook.exception.UserNotLoggedException;
+import com.bacefook.model.User;
+import com.bacefook.security.Cryptography;
+import com.bacefook.service.GenderService;
 import com.bacefook.service.UserService;
+import com.bacefook.utility.UserValidation;
 
 @RestController
-public class UserController {
-	
-	@Autowired private UserService userService;
-	
-		@GetMapping("{id}/friends")
-		public Set<FriendsListDTO> getFriendsOfUser(@PathVariable Integer id) throws UserNotFoundException {
-			return userService
-					.findUserById(id).getFriends()
-					.stream().map(user -> 
-					new FriendsListDTO(
-						user.getId(), 
-						user.getFirstName(), 
-						user.getLastName(), 
-						user.getFriends().size()))
-					.collect(Collectors.toSet());
-		}
-	
-	// TODO create a user/sign up
-	@PostMapping("signup")
-	public void signUp(@RequestBody SignUpDTO signUp) {
-		// TODO implement validation for signing up
-		// TODO maybe extract all the validation in their own methods in a new class
-		if (signUp.getPassword().equals(signUp.getPasswordConfirmation())) {
-			
-		}
-	}
-	
-	// TODO implement
-	@PostMapping("login")
-	public boolean login(@RequestBody LoginDTO login) {
-		return false;
-	}
-	
-	// TODO send a friend request to a user
-	// should create a new relation with the two users
-	
-	// TODO accept a friend request of a user
-	// should change the relation column 'is_confirmed' to 1
+public class UserController extends BaseController {
 
-	// TODO get all posts of a specific user
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private GenderService genderService;
+
+	@PostMapping("/users/{id}/changepassword")
+	public void changeUserPassword(@PathVariable("id") int id, @RequestBody ChangePasswordDTO passDto,
+			HttpServletRequest request)
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotLoggedException {
+		UserValidation validation = new UserValidation();
+		validation.validatePassword(passDto.getNewPassword());
+		validation.confirmPassword(passDto.getNewPassword(), passDto.getConfirmPassword());
+		try {
+			User user = userService.findUserById(id);
+			if (SessionManager.isLogged(request)) {
+				if (user.getPassword().matches(Cryptography.cryptSHA256(passDto.getOldPassword()))) {
+					user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
+				} else {
+					throw new InvalidUserCredentialsException("Wrong password!");
+				}
+			}
+			throw new UserNotLoggedException("This user is not logged!");
+		} catch (UserNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@PostMapping("/signup")
+	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
+			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException {
+
+		new UserValidation().validate(signUp);
+
+		Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
+		String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
+
+		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(), encodedPassword,
+				signUp.getBirthday());
+
+		SessionManager.signInUser(request, user);
+		return userService.saveUser(user);
+	}
+
+	@PostMapping("/login")
+	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException {
+		UserValidation validation = new UserValidation();
+		validation.validate(login);
+		try {
+			User user = userService.findUserByEmail(login.getEmail());
+			if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
+				SessionManager.signInUser(request, user);
+				return user.getId();
+			} else {
+ 				throw new InvalidUserCredentialsException("Credentials do not match!");
+			}
+		} catch (UserNotFoundException e) {
+			throw new InvalidUserCredentialsException("Credentials do not match!");
+		}
+	}
 	
+	@GetMapping("/users/{id}/logout")
+	public void logout(@PathVariable("id")int id,HttpServletRequest request) {
+		SessionManager.logOutUser(request);
+	}
 }

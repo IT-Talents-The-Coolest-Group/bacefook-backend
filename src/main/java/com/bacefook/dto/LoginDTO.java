@@ -1,11 +1,10 @@
 package com.bacefook.dto;
 
-import javax.validation.constraints.NotNull;
-
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 public class LoginDTO {
-	@NotNull private String email;
-	@NotNull private String password;
+	@NonNull private String email;
+	@NonNull private String password;
 }
