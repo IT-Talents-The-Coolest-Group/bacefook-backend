@@ -30,12 +30,12 @@ public class UserController {
 		new UserValidation().validate(signUp);
 
 		Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
-
+		String encodedPassword = signUp.getPassword(); // TODO encode
+		
 		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), 
-				signUp.getLastName(), signUp.getPassword(), signUp.getBirthday());
+				signUp.getLastName(), encodedPassword, signUp.getBirthday());
 
-		SessionManager.signInUser(request, user);
-
+		SessionManager.signInUser(request, user); 
 		return userService.saveUser(user);
 	}
 
@@ -44,20 +44,18 @@ public class UserController {
 		
 		UserValidation validation = new UserValidation();
 		validation.validate(login);
-		User user = null;
 		try {
-			user = userService.findUserByEmail(login.getEmail());
+			User user = userService.findUserByEmail(login.getEmail());
+			// passEncoder.matches(login.getPassword(), user.getPassword()); // TODO
+			
+			SessionManager.signInUser(request, user);
+			return user.getId();
 		}
 		catch (UserNotFoundException e) {
 			throw new InvalidUserCredentialsException("Credentials do not match!");
 		}
-		String encryptedPassword = login.getPassword(); // TODO do encryption here
-		
-		validation.confirmPassword(encryptedPassword, user.getPassword());
-		SessionManager.signInUser(request, user);
-		return user.getId();
 	}
 
-	// TODO get all posts of a specific user
+	// TODO get all posts of a specific user - should probably be in a posts controller class
 
 };

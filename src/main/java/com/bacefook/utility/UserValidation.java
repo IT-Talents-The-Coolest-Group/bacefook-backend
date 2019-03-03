@@ -14,9 +14,6 @@ public class UserValidation {
 	private static final int MAX_AGE = 120;
 	private final static String EMAIL_PATTERN = "^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,5}$";
 	private final static String PASSWORD_PATTERN = "^[a-zA-Z0-9]{8,30}$";
-
-	
-	
 	
 	private void validateEmail(String email) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(email) || !email.matches(EMAIL_PATTERN)) {
@@ -39,12 +36,6 @@ public class UserValidation {
 		}
 	}
 	
-	public void confirmPassword(String password, String passwordConfirmation) throws InvalidUserCredentialsException {
-		if (isNullOrEmpty(password) || !password.equals(passwordConfirmation)) {
-			throw new InvalidUserCredentialsException("Credentials do not match!");
-		}
-	}
-	
 	private void validateName(String name) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(name) || name.length() < MIN_NAMES_LENGTH) {
 			throw new InvalidUserCredentialsException("Invalid name, must be longer than " + MIN_NAMES_LENGTH + "!");
@@ -55,14 +46,19 @@ public class UserValidation {
 		return string == null || string.isEmpty();
 	}
 
+	public void confirmPassword(String password, String passwordConfirmation) throws InvalidUserCredentialsException {
+		if (isNullOrEmpty(password) || !password.equals(passwordConfirmation)) {
+			throw new InvalidUserCredentialsException("Credentials do not match!");
+		}
+	}
 	
 	public void validate(SignUpDTO signUp) throws InvalidUserCredentialsException {
+		validateName(signUp.getFirstName());
+		validateName(signUp.getLastName());
 		validateEmail(signUp.getEmail());
 		validatePassword(signUp.getPassword());
 		confirmPassword(signUp.getPassword(), signUp.getPasswordConfirmation());
 		validateBirthday(signUp.getBirthday());
-		validateName(signUp.getFirstName());
-		validateName(signUp.getLastName());
 	}
 	
 	public void validate(LoginDTO login) throws InvalidUserCredentialsException {
