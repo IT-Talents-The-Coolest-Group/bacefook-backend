@@ -29,7 +29,7 @@ public class UserController extends BaseController {
 	private GenderService genderService;
 
 	@PostMapping("signup")
-	public int signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
+	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
 			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException {
 
 		new UserValidation().validate(signUp);
@@ -45,7 +45,7 @@ public class UserController extends BaseController {
 	}
 
 	@PostMapping("login")
-	public int login(@RequestBody LoginDTO login, HttpServletRequest request)
+	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException {
 		UserValidation validation = new UserValidation();
 		validation.validate(login);

@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bacefook.exception.UserNotFoundException;
+import com.bacefook.model.Relation;
 import com.bacefook.model.User;
+import com.bacefook.repository.RelationsRepository;
 import com.bacefook.repository.UsersRepository;
 
 @Service
@@ -13,8 +15,8 @@ public class UserService {
 	@Autowired 
 	private UsersRepository usersRepo;
 	
-	// @Autowired 
-	// private RelationsRepository relationsRepo;
+	 @Autowired 
+	 private RelationsRepository relationsRepo;
 	
 	public User findUserByEmail(String email) throws UserNotFoundException {
 		User user = usersRepo.findByEmail(email);
@@ -38,8 +40,7 @@ public class UserService {
 	}
 	
 	public void makeRelation(Integer senderId, Integer receiverId) {
-//		usersRepo.save(new User());
-//		relationsRepo.save(new Relation(senderId, receiverId)); // TODO fix this
+		relationsRepo.save(new Relation(senderId, receiverId));
 	}
 	
 }
