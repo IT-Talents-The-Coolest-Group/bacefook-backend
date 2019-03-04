@@ -20,13 +20,13 @@ public class UserValidation {
 
 	private void validateEmail(String email) throws InvalidEmailException {
 		if (isNullOrEmpty(email) || !email.matches(EMAIL_PATTERN)) {
-			throw new InvalidEmailException("Wrong login credentials!");
+			throw new InvalidEmailException("Wrong credentials!");
 		}
 	}
 
 	public void validatePassword(String pass1) throws InvalidPasswordException {
 		if (isNullOrEmpty(pass1) || !pass1.matches(PASSWORD_PATTERN)) {
-			throw new InvalidPasswordException("Wrong login credentials");
+			throw new InvalidPasswordException("Wrong credentials");
 		}
 	}
 
