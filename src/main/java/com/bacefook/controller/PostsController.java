@@ -36,7 +36,7 @@ public class PostsController {
 			postsService.savePost(post);
 			return post.getId();
 		} else {
-			throw new UnauthorizedException("You are not logged! Please log in before you can add post.");
+			throw new UnauthorizedException("You are not logged in! Please log in before you can add a post.");
 		}
 	}
 
@@ -57,17 +57,22 @@ public class PostsController {
 	}
 	//TODO get post by id
 	@PutMapping("/posts")
-	public void updateStatus(@RequestParam("postId")Integer postId,@RequestBody String content ,HttpServletRequest request) throws UnauthorizedException, PostNotFoundException {
+	public void updateStatus(@RequestParam("postId")Integer postId, 
+			@RequestBody String content, HttpServletRequest request) 
+				throws UnauthorizedException, PostNotFoundException {
+		
 		if(SessionManager.isLogged(request)) {
 			System.out.println(content);
 			Post post = postsService.findPostById(postId);
+			
 			if(content.isEmpty()) {
 				throw new PostNotFoundException("Cannot update post with empty content!");
 			}
 			post.setContent(content);
 			postsService.savePost(post);
-		}else {
-			throw new UnauthorizedException("You are not logged! Please log in before you can update your posts.");
+		}
+		else {
+			throw new UnauthorizedException("You are not logged in! Please log in before trying to update your posts.");
 		}
 	}
 
