@@ -68,7 +68,6 @@ public class UserController extends BaseController {
 		try {
 			user = userService.findUserByEmail(signUp.getEmail());
 		} catch (UserNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (user != null) {

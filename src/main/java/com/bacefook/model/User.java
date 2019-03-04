@@ -52,8 +52,8 @@ public class User {
 		cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
     	name = "relations",
-    	joinColumns = { @JoinColumn(name = "user1_id") },
-    	inverseJoinColumns = { @JoinColumn(name = "user2_id") })
+    	joinColumns = { @JoinColumn(name = "sender_id") },
+    	inverseJoinColumns = { @JoinColumn(name = "receiver_id") })
 	@WhereJoinTable( 
 		clause = "is_confirmed = 1")
 	private Set<User> friends;
