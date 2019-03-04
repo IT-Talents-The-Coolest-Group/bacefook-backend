@@ -19,49 +19,49 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(InvalidFormatException.class)
-	public ResponseEntity<String> handleDateTimeParseError(InvalidFormatException e) {
-		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	public ResponseEntity<Object> handleDateTimeParseError(InvalidFormatException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 	@ExceptionHandler(NullPointerException.class)
-	public ResponseEntity<String> handleNullPointerError(NullPointerException e) {
+	public ResponseEntity<Object> handleNullPointerError(NullPointerException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-	public ResponseEntity<String> handleSQLIntegrityConstraintViolatingError(
+	public ResponseEntity<Object> handleSQLIntegrityConstraintViolatingError(
 			SQLIntegrityConstraintViolationException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler({ NoSuchAlgorithmException.class })
-	public ResponseEntity<String> handleNoSuchAlgorithmError(NoSuchAlgorithmException e) {
+	public ResponseEntity<Object> handleNoSuchAlgorithmError(NoSuchAlgorithmException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler({ UserNotFoundException.class })
-	public ResponseEntity<String> handleUserNotFoundError(UserNotFoundException e) {
+	public ResponseEntity<Object> handleUserNotFoundError(UserNotFoundException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler({ UserExistsException.class })
-	public ResponseEntity<String> handleUserExistsError(UserExistsException e) {
-		return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+	public ResponseEntity<Object> handleUserExistsError(UserExistsException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 	@ExceptionHandler({ UnauthorizedException.class })
-	public ResponseEntity<String> UnauthorizedError(UnauthorizedException e) {
+	public ResponseEntity<Object> UnauthorizedError(UnauthorizedException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 	}
 
 	@ExceptionHandler({ GenderNotFoundException.class })
-	public ResponseEntity<String> handleGenderNotFoundError(GenderNotFoundException e) {
+	public ResponseEntity<Object> handleGenderNotFoundError(GenderNotFoundException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler({ InvalidUserCredentialsException.class })
-	public ResponseEntity<String> handleInvalidUserError(InvalidUserCredentialsException e) {
-		return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+	public ResponseEntity<Object> handleInvalidUserError(InvalidUserCredentialsException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 	
 }

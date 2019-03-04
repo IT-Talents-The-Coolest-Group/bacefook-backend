@@ -70,7 +70,6 @@ public class UserValidation {
 			throw new InvalidUserCredentialsException("Password must not be empty!");
 		}
 	}
-
 	
 	public void validate(ChangePasswordDTO passChange) throws InvalidUserCredentialsException {
 		validatePassword(passChange.getNewPassword());

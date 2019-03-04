@@ -44,16 +44,21 @@ public class UserController extends GlobalExceptionHandler {
 		User user = userService.findUserById(id);
 	
 		if (SessionManager.isLogged(request)) {
-			if (user.getPassword().matches(Cryptography.cryptSHA256(passDto.getOldPassword()))) {
+			String oldPass = Cryptography.cryptSHA256(passDto.getOldPassword());
+			if (user.getPassword().matches(oldPass)) {
 				user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
-			} else {
+				userService.saveUser(user);
+			} 
+			else {
 				throw new InvalidUserCredentialsException("Wrong password!");
 			}
+		} 
+		else {
+			throw new UnauthorizedException("You are not logged in! Please log in before changing your password.");
 		}
-		throw new UnauthorizedException("You are not logged! Please log in before changing your password.");
 	}
 
-	@PostMapping("/signup")
+	@PostMapping("signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
 			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException,
 			UserExistsException {
@@ -61,20 +66,14 @@ public class UserController extends GlobalExceptionHandler {
 		new UserValidation().validate(signUp);
 
 		Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
-		User user = null;
-		try {
-			user = userService.findUserByEmail(signUp.getEmail());
-		} 
-		catch (UserNotFoundException e) {
-			e.printStackTrace();
-		}
-		if (user != null) {
+
+		if (userService.emailIsTaken(signUp.getEmail())) {
 			throw new UserExistsException("That email is already taken!");
 		}
 		String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
 
-		user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(), encodedPassword,
-				signUp.getBirthday());
+		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), 
+				signUp.getLastName(), encodedPassword, signUp.getBirthday());
 
 		SessionManager.signInUser(request, user);
 		return userService.saveUser(user);
@@ -90,17 +89,18 @@ public class UserController extends GlobalExceptionHandler {
 		if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
 			SessionManager.signInUser(request, user);
 			return user.getId();
-		} 
-		else {
+		} else {
 			throw new InvalidUserCredentialsException("Wrong login credentials!");
 		}
 	}
 
 	@GetMapping("/users/{id}/logout")
-	public void logout(@PathVariable("id") int id, HttpServletRequest request) throws UnauthorizedException {
+	public String logout(@PathVariable("id") int id, HttpServletRequest request) throws UnauthorizedException {
 		if (SessionManager.isLogged(request)) {
-			SessionManager.logOutUser(request);
+			String message = SessionManager.logOutUser(request);
+			return message;
+		} else {
+			throw new UnauthorizedException("You are not logged in!");
 		}
-		throw new UnauthorizedException("You are not logged in!");
 	}
 }

@@ -30,6 +30,10 @@ public class UserService {
 		return user;
 	}
 	
+	public boolean emailIsTaken(String email) {
+		return usersRepo.findByEmail(email) != null;
+	}
+	
 	public User findUserById(Integer id) throws UserNotFoundException {
 		try {
 			User user = usersRepo.findById(id).get();
