@@ -1,10 +1,12 @@
 package com.bacefook.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bacefook.exception.PostNotFoundException;
 import com.bacefook.model.Post;
 import com.bacefook.model.User;
 import com.bacefook.repository.PostsRepository;
@@ -24,5 +26,14 @@ public class PostService {
 	
 	public void savePost(Post post) {
 		postsRepo.save(post);
+	}
+	
+	public Post findPostById(Integer postId) throws PostNotFoundException { //TODO Global Handling
+		try {
+		Post post = postsRepo.findById(postId).get();
+		return post;
+		}catch(NoSuchElementException e) {
+			throw new PostNotFoundException("No such post!");
+		}
 	}
 }
