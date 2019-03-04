@@ -1,5 +1,9 @@
 package com.bacefook.service;
 
+import java.util.NoSuchElementException;
+
+import javax.management.relation.RelationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,19 +31,28 @@ public class UserService {
 	}
 	
 	public User findUserById(Integer id) throws UserNotFoundException {
-		User user = usersRepo.findById(id).get();
-		if (user == null) {
-			throw new UserNotFoundException("A user with that ID does not exist!");
+		try {
+			User user = usersRepo.findById(id).get();
+			return user;
 		}
-		return user;
+		catch (NoSuchElementException e) {
+			throw new UserNotFoundException("A user with that ID does not exist!", e);
+		}
 	}
 	
 	public Integer saveUser(User user) {
 		return usersRepo.save(user).getId();
 	}
 	
-	public void makeRelation(Integer senderId, Integer receiverId) {
-		relationsRepo.save(new Relation(senderId, receiverId));
+	public void makeRelation(Integer senderId, Integer receiverId) throws RelationException {
+		Relation friendRequest = new Relation(senderId, receiverId);
+		
+		if (relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId) == null) {
+			relationsRepo.save(friendRequest);
+		}
+		else {
+			throw new RelationException("You have already sent a request to that person!"); 
+		}
 	}
 	
 }

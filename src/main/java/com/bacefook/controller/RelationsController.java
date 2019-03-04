@@ -3,6 +3,7 @@ package com.bacefook.controller;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.management.relation.RelationException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.FriendsListDTO;
 import com.bacefook.exception.UserNotFoundException;
+import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.User;
 import com.bacefook.service.UserService;
 
@@ -29,10 +31,15 @@ public class RelationsController {
 	}
 	
 	@PutMapping("{id}/friendrequest")
-	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) {
+	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) 
+			throws RelationException, UnauthorizedException {
+		
 		if (SessionManager.isLogged(request)) {
 			User user = (User) request.getSession().getAttribute("logged");
 			userService.makeRelation(user.getId(), id);
+		}
+		else {
+			throw new UnauthorizedException("You have not logged in!");
 		}
 		
 	}

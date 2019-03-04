@@ -11,7 +11,7 @@ import com.bacefook.model.Post;
 import com.bacefook.service.PostService;
 
 @RestController
-public class PostsController extends BaseController{
+public class PostsController extends GlobalExceptionHandler{
 
 	@Autowired
 	private PostService postsService;

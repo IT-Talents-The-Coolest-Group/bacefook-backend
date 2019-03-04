@@ -3,11 +3,9 @@ package com.bacefook.utility;
 import java.time.LocalDate;
 import java.time.Period;
 
+import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
-import com.bacefook.exception.PasswordMatchingException;
-import com.bacefook.exception.InvalidEmailException;
-import com.bacefook.exception.InvalidPasswordException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 
 public class UserValidation {
@@ -18,15 +16,15 @@ public class UserValidation {
 	private final static String EMAIL_PATTERN = "^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,5}$";
 	private final static String PASSWORD_PATTERN = "^[a-zA-Z0-9]{8,30}$";
 
-	private void validateEmail(String email) throws InvalidEmailException {
+	private void validateEmail(String email) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(email) || !email.matches(EMAIL_PATTERN)) {
-			throw new InvalidEmailException("Wrong login credentials!");
+			throw new InvalidUserCredentialsException("Invalid email format!");
 		}
 	}
 
-	public void validatePassword(String pass1) throws InvalidPasswordException {
-		if (isNullOrEmpty(pass1) || !pass1.matches(PASSWORD_PATTERN)) {
-			throw new InvalidPasswordException("Wrong login credentials");
+	public void validatePassword(String password) throws InvalidUserCredentialsException {
+		if (isNullOrEmpty(password) || !password.matches(PASSWORD_PATTERN)) {
+			throw new InvalidUserCredentialsException("Invalid password, must only contain latin letters and numbers");
 		}
 	}
 
@@ -48,14 +46,13 @@ public class UserValidation {
 		return string == null || string.isEmpty();
 	}
 
-	public void confirmPassword(String password, String passwordConfirmation) throws PasswordMatchingException {
+	public void confirmPassword(String password, String passwordConfirmation) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(password) || !password.equals(passwordConfirmation)) {
-			throw new PasswordMatchingException("Passwords do not match!");
+			throw new InvalidUserCredentialsException("Passwords do not match!");
 		}
 	}
 
-	public void validate(SignUpDTO signUp) throws InvalidUserCredentialsException, PasswordMatchingException,
-			InvalidEmailException, InvalidPasswordException{
+	public void validate(SignUpDTO signUp) throws InvalidUserCredentialsException {
 		validateName(signUp.getFirstName());
 		validateName(signUp.getLastName());
 		validateEmail(signUp.getEmail());
@@ -64,14 +61,20 @@ public class UserValidation {
 		validateBirthday(signUp.getBirthday());
 	}
 
-	public void validate(LoginDTO login) throws InvalidPasswordException, InvalidEmailException {
+	public void validate(LoginDTO login) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(login.getEmail())) {
-			throw new InvalidEmailException("Email must not be empty!");
+			throw new InvalidUserCredentialsException("Email must not be empty!");
 		}
 
 		if (isNullOrEmpty(login.getPassword())) {
-			throw new InvalidPasswordException("Password must not be empty!");
+			throw new InvalidUserCredentialsException("Password must not be empty!");
 		}
+	}
+
+	
+	public void validate(ChangePasswordDTO passChange) throws InvalidUserCredentialsException {
+		validatePassword(passChange.getNewPassword());
+		confirmPassword(passChange.getNewPassword(), passChange.getConfirmPassword());		
 	}
 
 }

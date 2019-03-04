@@ -7,5 +7,5 @@ import com.bacefook.model.Relation;
 
 @Repository
 public interface RelationsRepository extends JpaRepository<Relation, Integer> {
-
+	public Relation findBySenderIdAndReceiverId(Integer senderId, Integer receiverId);
 }
