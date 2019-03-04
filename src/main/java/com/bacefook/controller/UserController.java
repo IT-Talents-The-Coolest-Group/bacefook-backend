@@ -16,9 +16,9 @@ import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
 import com.bacefook.exception.GenderNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
+import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.exception.UserExistsException;
 import com.bacefook.exception.UserNotFoundException;
-import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.User;
 import com.bacefook.security.Cryptography;
 import com.bacefook.service.GenderService;
@@ -29,7 +29,7 @@ import com.bacefook.utility.UserValidation;
 public class UserController extends GlobalExceptionHandler {
 
 	@Autowired
-	private UserService userService;
+ 	private UserService userService;
 	@Autowired
 	private GenderService genderService;
 

@@ -48,8 +48,12 @@ public class UserService {
 		return usersRepo.save(user).getId();
 	}
 	
-	public void makeRelation(Integer senderId, Integer receiverId) throws RelationException {
+	public void makeRelation(Integer senderId, Integer receiverId) throws RelationException, UserNotFoundException {
 		Relation friendRequest = new Relation(senderId, receiverId);
+		
+		if (!usersRepo.existsById(senderId) || !usersRepo.existsById(receiverId)) {
+			throw new UserNotFoundException("A user with that ID does not exist!");
+		}
 		
 		if (relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId) == null) {
 			relationsRepo.save(friendRequest);

@@ -32,14 +32,14 @@ public class RelationsController {
 	
 	@PutMapping("{id}/friendrequest")
 	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) 
-			throws RelationException, UnauthorizedException {
+			throws RelationException, UnauthorizedException, UserNotFoundException {
 		
 		if (SessionManager.isLogged(request)) {
 			User user = (User) request.getSession().getAttribute("logged");
 			userService.makeRelation(user.getId(), id);
 		}
 		else {
-			throw new UnauthorizedException("You have not logged in!");
+			throw new UnauthorizedException("You are not logged in!");
 		}
 		
 	}
