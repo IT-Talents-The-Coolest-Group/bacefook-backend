@@ -34,18 +34,19 @@ public class RelationsController {
 	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) 
 			throws RelationException, UnauthorizedException, ElementNotFoundException {
 		
-		userService.makeRelation(SessionManager.getLoggedUser(request).getId(), id);
+		//userService.makeRelation(SessionManager.getLoggedUser(request).getId(), id); // TODO fix session manager
 	}
 
-	@GetMapping("friendrequests")
-	public List<FriendsListDTO> getAllRequestsOfAUser(HttpServletRequest request) throws UnauthorizedException {
-		Integer receiverId = SessionManager.getLoggedUser(request).getId();
-		
-		return userService.findAllUsersFromRequestsTo(receiverId)
-				.stream().map(user -> new FriendsListDTO(user.getId(), 
-						user.getFirstName(), user.getLastName(), user.getFriends().size()))
-				.collect(Collectors.toList());
-	}
+	// TODO fix session manager
+//	@GetMapping("friendrequests")
+//	public List<FriendsListDTO> getAllRequestsOfAUser(HttpServletRequest request) throws UnauthorizedException {
+//		Integer receiverId = SessionManager.getLoggedUser(request).getId();
+//		
+//		return userService.findAllUsersFromRequestsTo(receiverId)
+//				.stream().map(user -> new FriendsListDTO(user.getId(), 
+//						user.getFirstName(), user.getLastName(), user.getFriends().size()))
+//				.collect(Collectors.toList());
+//	}
 	
 	// TODO accept a friend request of a user
 	// should change the relation column 'is_confirmed' to 1

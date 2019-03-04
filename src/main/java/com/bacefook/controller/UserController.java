@@ -5,7 +5,6 @@ import java.security.NoSuchAlgorithmException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,7 +39,7 @@ public class UserController {
 		new UserValidation().validate(passDto);;
 		User user = userService.findUserById(id);
 	
-		if (SessionManager.isLogged(request)) {
+		if (SessionManager.getLoggedUser(request)!=null) {
 			String oldPass = Cryptography.cryptSHA256(passDto.getOldPassword());
 			if (user.getPassword().matches(oldPass)) {
 				user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
@@ -71,7 +70,7 @@ public class UserController {
 		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), 
 				signUp.getLastName(), encodedPassword, signUp.getBirthday());
 
-		SessionManager.signInUser(request, user);
+		SessionManager.signInUser(request, user.getId());
 		return userService.saveUser(user);
 	}
 
@@ -83,21 +82,23 @@ public class UserController {
 		User user = userService.findUserByEmail(login.getEmail());
 		
 		if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
-			SessionManager.signInUser(request, user);
+//			response.setHeader("location", "https://google.bg");
+//			HttpHeaders headers = new HttpHeaders();
+			SessionManager.signInUser(request, user.getId());
 			return user.getId();
 		} else {
 			throw new InvalidUserCredentialsException("Wrong login credentials!");
 		}
 	}
 
-	@GetMapping("/users/{id}/logout")
+	@PostMapping("/users/{id}/logout")
 	public String logout(@PathVariable("id") int id, HttpServletRequest request) throws UnauthorizedException {
-		if (SessionManager.isLogged(request)) {
+//		if (SessionManager.isLogged(request)) {
 			String message = SessionManager.logOutUser(request);
 			return message;
-		} else {
-			throw new UnauthorizedException("You are not logged in!");
-		}
+//		} else {
+//			throw new UnauthorizedException("You are not logged in!");
+//		}
 	}
 
 }
