@@ -33,7 +33,7 @@ public class PostsController {
 			@RequestBody PostContentDTO postContentDto, HttpServletRequest request) 
 				throws UnauthorizedException { // Exceptions
 		
-		if (SessionManager.isLogged(request)) {
+		if (SessionManager.getLoggedUser(request)!=null) {
 			//TODO validate if properties are not empty
 			Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
 			postsService.savePost(post);
@@ -46,7 +46,7 @@ public class PostsController {
 	@GetMapping("/posts")
 	public List<PostDTO> getAllPostsByUser(@RequestParam("posterId") Integer posterId,HttpServletRequest request) 
 			throws UnauthorizedException {
-		if(SessionManager.isLogged(request)) {
+		if(SessionManager.getLoggedUser(request)!=null) {
 		List<Post> posts = postsService.findAllPostsByUserId(posterId);
 		List<PostDTO> returnedPosts = new ArrayList<>();
 		for (Post post : posts) {
@@ -66,7 +66,7 @@ public class PostsController {
 			@RequestBody PostContentDTO content, HttpServletRequest request) 
 				throws UnauthorizedException, ElementNotFoundException {
 		
-		if(SessionManager.isLogged(request)) {
+		if(SessionManager.getLoggedUser(request)!=null) {
 			System.out.println(content);
 			Post post = postsService.findPostById(postId);
 			
