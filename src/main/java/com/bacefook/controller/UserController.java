@@ -15,6 +15,9 @@ import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
 import com.bacefook.exception.GenderNotFoundException;
+import com.bacefook.exception.InvalidEmailException;
+import com.bacefook.exception.InvalidPasswordException;
+import com.bacefook.exception.PasswordMatchingException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UserExistsException;
 import com.bacefook.exception.UserNotFoundException;
@@ -36,11 +39,10 @@ public class UserController extends BaseController {
 	@PostMapping("/users/{id}/changepassword")
 	public void changeUserPassword(@PathVariable("id") int id, @RequestBody ChangePasswordDTO passDto,
 			HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotLoggedException {
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotLoggedException, UserNotFoundException, PasswordMatchingException, InvalidPasswordException {
 		UserValidation validation = new UserValidation();
 		validation.validatePassword(passDto.getNewPassword());
 		validation.confirmPassword(passDto.getNewPassword(), passDto.getConfirmPassword());
-		try {
 			User user = userService.findUserById(id);
 			if (SessionManager.isLogged(request)) {
 				if (user.getPassword().matches(Cryptography.cryptSHA256(passDto.getOldPassword()))) {
@@ -49,17 +51,13 @@ public class UserController extends BaseController {
 					throw new InvalidUserCredentialsException("Wrong password!");
 				}
 			}
-			throw new UserNotLoggedException("This user is not logged!");
-		} catch (UserNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			throw new UserNotLoggedException("You are not logged! Please log in before changing your password.");
 	}
 
 	@PostMapping("/signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
 			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException,
-			UserExistsException {
+			UserExistsException,  PasswordMatchingException, InvalidEmailException, InvalidPasswordException {
 
 		new UserValidation().validate(signUp);
 
@@ -67,11 +65,13 @@ public class UserController extends BaseController {
 		User user = null;
 		try {
 			user = userService.findUserByEmail(signUp.getEmail());
-		} catch (UserNotFoundException e) {
+		} 
+		catch (UserNotFoundException e) {
 			e.printStackTrace();
+			System.out.println("Email is free to register.");
 		}
 		if (user != null) {
-			throw new UserExistsException("User with that email already exists!");
+			throw new UserExistsException();
 		}
 		String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
 
@@ -84,19 +84,16 @@ public class UserController extends BaseController {
 
 	@PostMapping("/login")
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException {
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotFoundException, InvalidPasswordException, InvalidEmailException {
 		UserValidation validation = new UserValidation();
 		validation.validate(login);
-		try {
-			User user = userService.findUserByEmail(login.getEmail());
-			if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
-				SessionManager.signInUser(request, user);
-				return user.getId();
-			} else {
-				throw new InvalidUserCredentialsException("Credentials do not match!");
-			}
-		} catch (UserNotFoundException e) {
-			throw new InvalidUserCredentialsException("Credentials do not match!");
+		User user = userService.findUserByEmail(login.getEmail());
+		if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
+			SessionManager.signInUser(request, user);
+			return user.getId();
+		} 
+		else {
+			throw new InvalidUserCredentialsException("Wrong login credentials!");
 		}
 	}
 
@@ -105,6 +102,6 @@ public class UserController extends BaseController {
 		if (SessionManager.isLogged(request)) {
 			SessionManager.logOutUser(request);
 		}
-		throw new UserNotLoggedException("User is not logged!");
+		throw new UserNotLoggedException("You are not logged!");
 	}
 }
