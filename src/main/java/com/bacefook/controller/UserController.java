@@ -5,7 +5,6 @@ import java.security.NoSuchAlgorithmException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,30 +25,26 @@ import com.bacefook.utility.UserValidation;
 public class UserController {
 
 	@Autowired
- 	private UserService userService;
+	private UserService userService;
 	@Autowired
 	private GenderService genderService;
 
-	@PostMapping("/users/{id}/changepassword")
-	public void changeUserPassword(@PathVariable("id") int id, 
-			@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, 
-			UnauthorizedException, ElementNotFoundException {
-		
-		new UserValidation().validate(passDto);;
-		User user = userService.findUserById(id);
-	
-		if (SessionManager.getLoggedUser(request)!=null) {
+	@PostMapping("/users/changepassword")
+	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UnauthorizedException,
+			ElementNotFoundException {
+		new UserValidation().validate(passDto);
+		int userId = SessionManager.getLoggedUser(request);
+		if (userId != -1) {
+			User user = userService.findUserById((Integer) userId);
 			String oldPass = Cryptography.cryptSHA256(passDto.getOldPassword());
 			if (user.getPassword().matches(oldPass)) {
 				user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
 				userService.saveUser(user);
-			} 
-			else {
+			} else {
 				throw new InvalidUserCredentialsException("Wrong password!");
 			}
-		} 
-		else {
+		} else {
 			throw new UnauthorizedException("You are not logged in! Please log in before changing your password.");
 		}
 	}
@@ -67,8 +62,8 @@ public class UserController {
 		}
 		String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
 
-		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), 
-				signUp.getLastName(), encodedPassword, signUp.getBirthday());
+		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(), encodedPassword,
+				signUp.getBirthday());
 
 		SessionManager.signInUser(request, user.getId());
 		return userService.saveUser(user);
@@ -77,10 +72,10 @@ public class UserController {
 	@PostMapping("/login")
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException {
-		
+
 		new UserValidation().validate(login);
 		User user = userService.findUserByEmail(login.getEmail());
-		
+
 		if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
 //			response.setHeader("location", "https://google.bg");
 //			HttpHeaders headers = new HttpHeaders();
@@ -91,14 +86,14 @@ public class UserController {
 		}
 	}
 
-	@PostMapping("/users/{id}/logout")
-	public String logout(@PathVariable("id") int id, HttpServletRequest request) throws UnauthorizedException {
-//		if (SessionManager.isLogged(request)) {
+	@PostMapping("/logout")
+	public String logout(HttpServletRequest request) throws UnauthorizedException {
+		if (SessionManager.getLoggedUser(request) != -1) {
 			String message = SessionManager.logOutUser(request);
 			return message;
-//		} else {
-//			throw new UnauthorizedException("You are not logged in!");
-//		}
+		} else {
+			throw new UnauthorizedException("You are not logged in!");
+		}
 	}
 
 }

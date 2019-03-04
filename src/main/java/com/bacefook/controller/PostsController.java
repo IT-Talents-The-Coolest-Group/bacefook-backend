@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,19 +21,21 @@ import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
 import com.bacefook.service.PostService;
 
+
 @RestController
 public class PostsController {
 
 	@Autowired
 	private PostService postsService;
 
-	@PostMapping("/posts/{posterId}")
-	public int addPostToUser(@PathVariable("posterId") Integer posterId, 
-			@RequestBody PostContentDTO postContentDto, HttpServletRequest request) 
-				throws UnauthorizedException { // Exceptions
-		
-		if (SessionManager.getLoggedUser(request)!=null) {
-			//TODO validate if properties are not empty
+	@PostMapping("/posts")
+	public int addPostToUser(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
+			throws UnauthorizedException { // Exceptions
+		int posterId = SessionManager.getLoggedUser(request);
+		if (posterId != -1) {
+			// TODO validate if properties are not empty
+			// TODO should we cast posterId from Object or method getLoggedUser should
+			// return int
 			Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
 			postsService.savePost(post);
 			return post.getId();
@@ -44,39 +45,36 @@ public class PostsController {
 	}
 
 	@GetMapping("/posts")
-	public List<PostDTO> getAllPostsByUser(@RequestParam("posterId") Integer posterId,HttpServletRequest request) 
-			throws UnauthorizedException {
-		if(SessionManager.getLoggedUser(request)!=null) {
-		List<Post> posts = postsService.findAllPostsByUserId(posterId);
-		List<PostDTO> returnedPosts = new ArrayList<>();
-		for (Post post : posts) {
-			PostDTO postDto = new PostDTO(post.getPosterId(), post.getSharesPostId(), post.getContent(),
-					post.getPostingTime());
-			returnedPosts.add(postDto);
-		}
-		return returnedPosts;
-		}else {
+	public List<PostDTO> getAllPostsByUser(HttpServletRequest request) throws UnauthorizedException {
+		int posterId = SessionManager.getLoggedUser(request);
+		if (posterId != -1) {
+			List<Post> posts = postsService.findAllPostsByUserId(posterId);
+			List<PostDTO> returnedPosts = new ArrayList<>();
+			for (Post post : posts) {
+				PostDTO postDto = new PostDTO(post.getPosterId(), post.getSharesPostId(), post.getContent(),
+						post.getPostingTime());
+				returnedPosts.add(postDto);
+			}
+			return returnedPosts;
+		} else {
 			throw new UnauthorizedException("You are not logged! Please log in before you can see your posts.");
 		}
 	}
-	
-	//TODO get post by id
+
+	// get post by id
 	@PutMapping("/posts")
-	public void updateStatus(@RequestParam("postId")Integer postId, 
-			@RequestBody PostContentDTO content, HttpServletRequest request) 
-				throws UnauthorizedException, ElementNotFoundException {
-		
-		if(SessionManager.getLoggedUser(request)!=null) {
+	public void updateStatus(@RequestParam("postId") Integer postId, @RequestBody PostContentDTO content,
+			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+		if (SessionManager.getLoggedUser(request) != -1) {
 			System.out.println(content);
 			Post post = postsService.findPostById(postId);
-			
-			if(content.getContent().isEmpty()) {
+
+			if (content.getContent().isEmpty()) {
 				throw new ElementNotFoundException("Cannot update post with empty content!");
 			}
 			post.setContent(content.getContent());
 			postsService.savePost(post);
-		}
-		else {
+		} else {
 			throw new UnauthorizedException("You are not logged in! Please log in before trying to update your posts.");
 		}
 	}
