@@ -2,24 +2,23 @@ package com.bacefook.dto;
 
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotNull;
-
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 public class SignUpDTO {
-	@NotNull
+	@NonNull
 	private String gender;
-	@NotNull
+	@NonNull
 	private String email;
-	@NotNull
+	@NonNull
 	private String firstName;
-	@NotNull
+	@NonNull
 	private String lastName;
-	@NotNull
+	@NonNull
 	private String password;
-	@NotNull
+	@NonNull
 	private String passwordConfirmation;
-	@NotNull
+	@NonNull
 	private LocalDate birthday;
 }
