@@ -38,26 +38,30 @@ public class UserController extends BaseController {
 
 	@PostMapping("/users/{id}/changepassword")
 	public void changeUserPassword(@PathVariable("id") int id, @RequestBody ChangePasswordDTO passDto,
-			HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotLoggedException, UserNotFoundException, PasswordMatchingException, InvalidPasswordException {
+			HttpServletRequest request) throws InvalidUserCredentialsException, NoSuchAlgorithmException,
+			UserNotLoggedException, UserNotFoundException, PasswordMatchingException, InvalidPasswordException {
 		UserValidation validation = new UserValidation();
 		validation.validatePassword(passDto.getNewPassword());
 		validation.confirmPassword(passDto.getNewPassword(), passDto.getConfirmPassword());
-			User user = userService.findUserById(id);
-			if (SessionManager.isLogged(request)) {
-				if (user.getPassword().matches(Cryptography.cryptSHA256(passDto.getOldPassword()))) {
-					user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
-				} else {
-					throw new InvalidUserCredentialsException("Wrong password!");
-				}
+		User user = userService.findUserById(id);
+		if (SessionManager.isLogged(request)) {
+			String oldPass = Cryptography.cryptSHA256(passDto.getOldPassword());
+			if (user.getPassword().matches(oldPass)) {
+				String newPass = Cryptography.cryptSHA256(passDto.getNewPassword());
+				user.setPassword(newPass);
+				userService.saveUser(user);
+			} else {
+				throw new InvalidUserCredentialsException("Wrong password!");
 			}
+		} else {
 			throw new UserNotLoggedException("You are not logged! Please log in before changing your password.");
+		}
 	}
 
 	@PostMapping("/signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
 			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException,
-			UserExistsException,  PasswordMatchingException, InvalidEmailException, InvalidPasswordException {
+			UserExistsException, PasswordMatchingException, InvalidEmailException, InvalidPasswordException {
 
 		new UserValidation().validate(signUp);
 
@@ -65,9 +69,7 @@ public class UserController extends BaseController {
 		User user = null;
 		try {
 			user = userService.findUserByEmail(signUp.getEmail());
-		} 
-		catch (UserNotFoundException e) {
-			e.printStackTrace();
+		} catch (UserNotFoundException e) {
 			System.out.println("Email is free to register.");
 		}
 		if (user != null) {
@@ -84,24 +86,26 @@ public class UserController extends BaseController {
 
 	@PostMapping("/login")
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotFoundException, InvalidPasswordException, InvalidEmailException {
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotFoundException,
+			InvalidPasswordException, InvalidEmailException {
 		UserValidation validation = new UserValidation();
 		validation.validate(login);
 		User user = userService.findUserByEmail(login.getEmail());
 		if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
 			SessionManager.signInUser(request, user);
 			return user.getId();
-		} 
-		else {
+		} else {
 			throw new InvalidUserCredentialsException("Wrong login credentials!");
 		}
 	}
 
 	@GetMapping("/users/{id}/logout")
-	public void logout(@PathVariable("id") int id, HttpServletRequest request) throws UserNotLoggedException {
+	public String logout(@PathVariable("id") int id, HttpServletRequest request) throws UserNotLoggedException {
 		if (SessionManager.isLogged(request)) {
-			SessionManager.logOutUser(request);
+			String message = SessionManager.logOutUser(request);
+			return message;
+		} else {
+			throw new UserNotLoggedException("You are not logged!");
 		}
-		throw new UserNotLoggedException("You are not logged!");
 	}
 }

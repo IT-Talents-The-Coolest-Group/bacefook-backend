@@ -1,28 +1,54 @@
 package com.bacefook.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bacefook.dto.PostDTO;
+import com.bacefook.exception.UserNotLoggedException;
 import com.bacefook.model.Post;
 import com.bacefook.service.PostService;
 
 @RestController
-public class PostsController extends BaseController{
+public class PostsController extends BaseController {
 
 	@Autowired
 	private PostService postsService;
 
 	@PostMapping("/posts")
-	public int addPostToUser(@RequestBody Post post) {//TODO BaseController is not catching Exceptions 
-		post.setPostingTime(LocalDateTime.now());
-		postsService.savePost(post);
-		return post.getId();
+	public int addPostToUser(@RequestBody Post post, HttpServletRequest request) throws UserNotLoggedException { // Exceptions
+		if (SessionManager.isLogged(request)) {
+			post.setPostingTime(LocalDateTime.now());
+			postsService.savePost(post);
+			return post.getId();
+		} else {
+			throw new UserNotLoggedException("You are not logged! Please log in before you can add post.");
+		}
 	}
-	// TODO "post request" a new post from a user
 
-	// TODO get all posts of a specific user
+	@GetMapping("/posts")
+	public List<PostDTO> getAllPostsByUser(@RequestParam("posterId") Integer posterId,HttpServletRequest request) throws UserNotLoggedException {
+		if(SessionManager.isLogged(request)) {
+		List<Post> posts = postsService.findAllPostsByUserId(posterId);
+		List<PostDTO> returnedPosts = new ArrayList<>();
+		for (Post post : posts) {
+			PostDTO postDto = new PostDTO(post.getPosterId(), post.getSharesPostId(), post.getContent(),
+					post.getPostingTime());
+			returnedPosts.add(postDto);
+		}
+		return returnedPosts;
+		}else {
+			throw new UserNotLoggedException("You are not logged! Please log in before you can see your posts.");
+		}
+	}
+
 }

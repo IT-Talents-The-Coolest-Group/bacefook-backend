@@ -18,6 +18,7 @@ import com.bacefook.exception.UserNotFoundException;
 import com.bacefook.exception.UserNotLoggedException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
+
 @ControllerAdvice
 public class BaseController {
 	@ExceptionHandler({ InvalidFormatException.class })
@@ -53,7 +54,7 @@ public class BaseController {
 	@ExceptionHandler({ UserNotLoggedException.class })
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	public String handleUserNotLoggedError(UserNotLoggedException e) {
-		return e.getMessage();
+		return e.getMessage();//TODO parse to JSON
 	}
 
 	@ExceptionHandler({ GenderNotFoundException.class })

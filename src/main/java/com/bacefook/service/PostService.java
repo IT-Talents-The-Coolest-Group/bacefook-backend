@@ -18,6 +18,10 @@ public class PostService {
 		return postsRepo.findAllByPosterId(poster.getId());
 	}
 	
+	public List<Post> findAllPostsByUserId(Integer posterId){
+		return postsRepo.findAllByPosterId(posterId);
+	}
+	
 	public void savePost(Post post) {
 		postsRepo.save(post);
 	}
