@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.PostContentDTO;
 import com.bacefook.dto.PostDTO;
-import com.bacefook.exception.PostNotFoundException;
+import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
 import com.bacefook.service.PostService;
@@ -29,7 +29,10 @@ public class PostsController {
 	private PostService postsService;
 
 	@PostMapping("/posts/{posterId}")
-	public int addPostToUser(@PathVariable("posterId")Integer posterId,@RequestBody PostContentDTO postContentDto, HttpServletRequest request) throws UnauthorizedException { // Exceptions
+	public int addPostToUser(@PathVariable("posterId") Integer posterId, 
+			@RequestBody PostContentDTO postContentDto, HttpServletRequest request) 
+				throws UnauthorizedException { // Exceptions
+		
 		if (SessionManager.isLogged(request)) {
 			//TODO validate if properties are not empty
 			Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
@@ -41,7 +44,8 @@ public class PostsController {
 	}
 
 	@GetMapping("/posts")
-	public List<PostDTO> getAllPostsByUser(@RequestParam("posterId") Integer posterId,HttpServletRequest request) throws UnauthorizedException {
+	public List<PostDTO> getAllPostsByUser(@RequestParam("posterId") Integer posterId,HttpServletRequest request) 
+			throws UnauthorizedException {
 		if(SessionManager.isLogged(request)) {
 		List<Post> posts = postsService.findAllPostsByUserId(posterId);
 		List<PostDTO> returnedPosts = new ArrayList<>();
@@ -55,20 +59,21 @@ public class PostsController {
 			throw new UnauthorizedException("You are not logged! Please log in before you can see your posts.");
 		}
 	}
+	
 	//TODO get post by id
 	@PutMapping("/posts")
 	public void updateStatus(@RequestParam("postId")Integer postId, 
-			@RequestBody String content, HttpServletRequest request) 
-				throws UnauthorizedException, PostNotFoundException {
+			@RequestBody PostContentDTO content, HttpServletRequest request) 
+				throws UnauthorizedException, ElementNotFoundException {
 		
 		if(SessionManager.isLogged(request)) {
 			System.out.println(content);
 			Post post = postsService.findPostById(postId);
 			
-			if(content.isEmpty()) {
-				throw new PostNotFoundException("Cannot update post with empty content!");
+			if(content.getContent().isEmpty()) {
+				throw new ElementNotFoundException("Cannot update post with empty content!");
 			}
-			post.setContent(content);
+			post.setContent(content.getContent());
 			postsService.savePost(post);
 		}
 		else {

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.FriendsListDTO;
-import com.bacefook.exception.UserNotFoundException;
+import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.User;
 import com.bacefook.service.UserService;
@@ -24,7 +24,7 @@ public class RelationsController {
 	private UserService userService;
 	
 	@GetMapping("{id}/friends")
-	public Set<FriendsListDTO> getFriendsOfUser(@PathVariable Integer id) throws UserNotFoundException {
+	public Set<FriendsListDTO> getFriendsOfUser(@PathVariable Integer id) throws ElementNotFoundException {
 		return userService.findUserById(id).getFriends().stream().map(
 				user -> new FriendsListDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getFriends().size()))
 				.collect(Collectors.toSet());
@@ -32,7 +32,7 @@ public class RelationsController {
 	
 	@PutMapping("{id}/friendrequest")
 	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) 
-			throws RelationException, UnauthorizedException, UserNotFoundException {
+			throws RelationException, UnauthorizedException, ElementNotFoundException {
 		
 		if (SessionManager.isLogged(request)) {
 			User user = (User) request.getSession().getAttribute("logged");

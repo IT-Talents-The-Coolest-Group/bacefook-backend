@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
-import com.bacefook.exception.GenderNotFoundException;
+import com.bacefook.exception.ElementNotFoundException;
+import com.bacefook.exception.GlobalExceptionHandler;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
-import com.bacefook.exception.UserExistsException;
-import com.bacefook.exception.UserNotFoundException;
 import com.bacefook.model.User;
 import com.bacefook.security.Cryptography;
 import com.bacefook.service.GenderService;
@@ -34,11 +33,9 @@ public class UserController extends GlobalExceptionHandler {
 	private GenderService genderService;
 
 	@PostMapping("/users/{id}/changepassword")
-	public void changeUserPassword(@PathVariable("id") int id, 
-			@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
-			
+	public void changeUserPassword(@PathVariable("id") int id, @RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, 
-			UnauthorizedException, UserNotFoundException {
+			UnauthorizedException, ElementNotFoundException {
 		
 		new UserValidation().validate(passDto);;
 		User user = userService.findUserById(id);
@@ -60,15 +57,14 @@ public class UserController extends GlobalExceptionHandler {
 
 	@PostMapping("signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
-			throws InvalidUserCredentialsException, GenderNotFoundException, NoSuchAlgorithmException,
-			UserExistsException {
+			throws InvalidUserCredentialsException, ElementNotFoundException, NoSuchAlgorithmException {
 
 		new UserValidation().validate(signUp);
 
 		Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
 
 		if (userService.emailIsTaken(signUp.getEmail())) {
-			throw new UserExistsException("That email is already taken!");
+			throw new InvalidUserCredentialsException("That email is already taken!");
 		}
 		String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
 
@@ -81,7 +77,7 @@ public class UserController extends GlobalExceptionHandler {
 
 	@PostMapping("/login")
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UserNotFoundException {
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException {
 		
 		new UserValidation().validate(login);
 		User user = userService.findUserByEmail(login.getEmail());

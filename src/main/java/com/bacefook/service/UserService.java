@@ -7,7 +7,7 @@ import javax.management.relation.RelationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bacefook.exception.UserNotFoundException;
+import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.model.Relation;
 import com.bacefook.model.User;
 import com.bacefook.repository.RelationsRepository;
@@ -21,11 +21,11 @@ public class UserService {
 	@Autowired 
 	private RelationsRepository relationsRepo;
 	
-	public User findUserByEmail(String email) throws UserNotFoundException {
+	public User findUserByEmail(String email) throws ElementNotFoundException {
 		User user = usersRepo.findByEmail(email);
 		
 		if (user == null) {
-			throw new UserNotFoundException("A user with that email does not exist!");
+			throw new ElementNotFoundException("A user with that email does not exist!");
 		}
 		return user;
 	}
@@ -34,13 +34,13 @@ public class UserService {
 		return usersRepo.findByEmail(email) != null;
 	}
 	
-	public User findUserById(Integer id) throws UserNotFoundException {
+	public User findUserById(Integer id) throws ElementNotFoundException {
 		try {
 			User user = usersRepo.findById(id).get();
 			return user;
 		}
 		catch (NoSuchElementException e) {
-			throw new UserNotFoundException("A user with that ID does not exist!", e);
+			throw new ElementNotFoundException("A user with that ID does not exist!", e);
 		}
 	}
 	
@@ -48,11 +48,11 @@ public class UserService {
 		return usersRepo.save(user).getId();
 	}
 	
-	public void makeRelation(Integer senderId, Integer receiverId) throws RelationException, UserNotFoundException {
+	public void makeRelation(Integer senderId, Integer receiverId) throws RelationException, ElementNotFoundException {
 		Relation friendRequest = new Relation(senderId, receiverId);
 		
 		if (!usersRepo.existsById(senderId) || !usersRepo.existsById(receiverId)) {
-			throw new UserNotFoundException("A user with that ID does not exist!");
+			throw new ElementNotFoundException("A user with that ID does not exist!");
 		}
 		
 		if (relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId) == null) {
