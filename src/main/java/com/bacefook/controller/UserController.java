@@ -15,7 +15,6 @@ import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
 import com.bacefook.exception.ElementNotFoundException;
-import com.bacefook.exception.GlobalExceptionHandler;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.User;
@@ -25,7 +24,7 @@ import com.bacefook.service.UserService;
 import com.bacefook.utility.UserValidation;
 
 @RestController
-public class UserController extends GlobalExceptionHandler {
+public class UserController {
 
 	@Autowired
  	private UserService userService;
@@ -33,7 +32,8 @@ public class UserController extends GlobalExceptionHandler {
 	private GenderService genderService;
 
 	@PostMapping("/users/{id}/changepassword")
-	public void changeUserPassword(@PathVariable("id") int id, @RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
+	public void changeUserPassword(@PathVariable("id") int id, 
+			@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, 
 			UnauthorizedException, ElementNotFoundException {
 		
@@ -99,4 +99,5 @@ public class UserController extends GlobalExceptionHandler {
 			throw new UnauthorizedException("You are not logged in!");
 		}
 	}
+
 }

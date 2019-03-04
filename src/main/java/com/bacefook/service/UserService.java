@@ -1,6 +1,10 @@
 package com.bacefook.service;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.management.relation.RelationException;
 
@@ -20,7 +24,7 @@ public class UserService {
 	private UsersRepository usersRepo;
 	@Autowired 
 	private RelationsRepository relationsRepo;
-	
+
 	public User findUserByEmail(String email) throws ElementNotFoundException {
 		User user = usersRepo.findByEmail(email);
 		
@@ -61,6 +65,25 @@ public class UserService {
 		else {
 			throw new RelationException("You have already sent a request to that person!"); 
 		}
+	}
+
+	
+	public List<User> findAllUsersFromRequestsTo(Integer receiverId) {
+		List<Optional<User>> optionalUsers = 
+				relationsRepo
+				.findAllByReceiverId(receiverId)
+				.stream()
+				.map(relation -> usersRepo.findById(relation.getSenderId()))
+				.collect(Collectors.toList());
+		
+		List<User> users = new LinkedList<User>();
+		for (Optional<User> optional : optionalUsers) {
+			if (optional.isPresent()) {
+				users.add(optional.get());
+			}
+		}
+		
+		return users;
 	}
 	
 }

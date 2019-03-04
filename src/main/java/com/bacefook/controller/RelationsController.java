@@ -1,5 +1,6 @@
 package com.bacefook.controller;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bacefook.dto.FriendsListDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
-import com.bacefook.model.User;
 import com.bacefook.service.UserService;
 
 @RestController
@@ -34,16 +34,20 @@ public class RelationsController {
 	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) 
 			throws RelationException, UnauthorizedException, ElementNotFoundException {
 		
-		if (SessionManager.isLogged(request)) {
-			User user = (User) request.getSession().getAttribute("logged");
-			userService.makeRelation(user.getId(), id);
-		}
-		else {
-			throw new UnauthorizedException("You are not logged in!");
-		}
-		
+		userService.makeRelation(SessionManager.getLoggedUser(request).getId(), id);
 	}
 
+	@GetMapping("friendrequests")
+	public List<FriendsListDTO> getAllRequestsOfAUser(HttpServletRequest request) throws UnauthorizedException {
+		Integer receiverId = SessionManager.getLoggedUser(request).getId();
+		
+		return userService.findAllUsersFromRequestsTo(receiverId)
+				.stream().map(user -> new FriendsListDTO(user.getId(), 
+						user.getFirstName(), user.getLastName(), user.getFriends().size()))
+				.collect(Collectors.toList());
+	}
+	
 	// TODO accept a friend request of a user
 	// should change the relation column 'is_confirmed' to 1
+
 }

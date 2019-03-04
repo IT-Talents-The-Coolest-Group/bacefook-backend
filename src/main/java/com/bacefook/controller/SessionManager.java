@@ -3,6 +3,7 @@ package com.bacefook.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.User;
 
 public class SessionManager {
@@ -41,9 +42,14 @@ public class SessionManager {
 	}
 
 	/**
-	 * @return Logged user's ID, or null if no user is logged
+	 * @return Logged user's ID, or null if no user is logged in
+	 * @throws UnauthorizedException 
 	 */
-	public static User getLoggedUser(HttpServletRequest request) {
+	public static User getLoggedUser(HttpServletRequest request) throws UnauthorizedException {
+		if (!isLogged(request)) {
+			throw new UnauthorizedException("You are not logged in");
+		}
+		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute(LOGGED_STATUS);
 		System.out.println(user);
