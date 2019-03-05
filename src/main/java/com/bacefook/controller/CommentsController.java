@@ -37,7 +37,7 @@ public class CommentsController {
 
 	// get comment by id
 	@PutMapping("/comments")
-	public void updateStatus(@RequestParam("commentId") Integer commentId, @RequestBody CommentContentDTO content,
+	public void updateComment(@RequestParam("commentId") Integer commentId, @RequestBody CommentContentDTO content,
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
 		if (SessionManager.isLogged(request)) {
 			System.out.println(content);
