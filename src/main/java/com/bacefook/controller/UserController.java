@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,26 +60,26 @@ public class UserController {
 
 	@PostMapping("/signup")
 	public ResponseEntity<Integer> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
-			throws InvalidUserCredentialsException, ElementNotFoundException, NoSuchAlgorithmException,
-			UnauthorizedException {
+			throws InvalidUserCredentialsException, ElementNotFoundException, 
+			NoSuchAlgorithmException, UnauthorizedException {
 
 		new UserValidation().validate(signUp);
-		if (!SessionManager.isLogged(request)) {
-			// TODO check if you are logged
-			Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
-
-			if (userService.emailIsTaken(signUp.getEmail())) {
-				throw new InvalidUserCredentialsException("That email is already taken!");
-			}
-			String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
-
-			User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(),
-					encodedPassword, signUp.getBirthday());
-			SessionManager.signInUser(request, user);
-			return new ResponseEntity<>(userService.saveUser(user), HttpStatus.OK);
-		} else {
+		if (SessionManager.isLogged(request)) {
 			throw new UnauthorizedException("Please log out before you can register!");
 		}
+
+		if (userService.emailIsTaken(signUp.getEmail())) {
+			throw new InvalidUserCredentialsException("That email is already taken!");
+		}
+		
+		User user = new User();
+		new ModelMapper().map(signUp, user);
+		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
+		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
+
+		SessionManager.signInUser(request, user);
+		return new ResponseEntity<>(userService.saveUser(user), HttpStatus.OK);
+		
 	}
 
 	@PostMapping("/login")
