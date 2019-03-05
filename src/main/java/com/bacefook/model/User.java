@@ -24,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
-@RequiredArgsConstructor
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "users")
 public class User {
 
@@ -58,4 +58,7 @@ public class User {
 		clause = "is_confirmed = 1")
 	private Set<User> friends;
 
+	public String getFullName() {
+		return getFirstName() + " " + getLastName();
+	}
 }

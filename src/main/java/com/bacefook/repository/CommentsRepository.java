@@ -3,10 +3,9 @@ package com.bacefook.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.bacefook.model.User;
+import com.bacefook.model.Comment;
 
 @Repository
-public interface UsersRepository extends JpaRepository<User, Integer> {
-	public User findByEmail(String email);
-	
+public interface CommentsRepository extends JpaRepository<Comment, Integer>{
+
 }
