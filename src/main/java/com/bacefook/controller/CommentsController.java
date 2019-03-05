@@ -1,23 +1,31 @@
 package com.bacefook.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.CommentContentDTO;
+import com.bacefook.dto.CommentDTO;
+import com.bacefook.dto.PostDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Comment;
+import com.bacefook.model.Post;
 import com.bacefook.service.CommentService;
+import com.bacefook.utility.TimeConverter;
 
 @RestController
 public class CommentsController {
@@ -58,4 +66,27 @@ public class CommentsController {
 			throw new UnauthorizedException("You are not logged in! Please log in before trying to update your posts.");
 		}
 	}
+	@GetMapping("/comments")
+	public ResponseEntity<List<CommentDTO>> getAllCommentsByPost(@RequestHeader("postId") Integer postId,
+			HttpServletRequest request) {
+
+		// TODO check if user is friend with poster
+//		SessionManager.getLoggedUser(request);
+
+		List<Comment> comments = commentsService.g
+		List<PostDTO> returnedPosts = new ArrayList<>();
+
+		for (Post post : posts) {
+			String posterFullName = userService.findUserById(post.getPosterId()).getFullName();
+
+			String timeOfPosting = TimeConverter.convertTimeToString(post.getPostingTime());
+
+			PostDTO postDto = new PostDTO(posterFullName, post.getSharesPostId(), post.getContent(), timeOfPosting);
+
+			returnedPosts.add(postDto);
+		}
+		return new ResponseEntity<>(returnedPosts, HttpStatus.OK);
+
+	}
+
 }
