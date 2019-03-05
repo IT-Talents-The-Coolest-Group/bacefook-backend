@@ -1,5 +1,6 @@
 package com.bacefook.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class CommentService {
 	public void saveComment(Comment comment) {
 		commentsRepo.save(comment);
 	}
+	
 	public Comment findCommentById(Integer commentId) throws ElementNotFoundException {
 		//TODO Global Handling
 		//TODO commentId!=null
@@ -29,4 +31,11 @@ public class CommentService {
 		}
 	}
 	
+	public List<Comment> getAllCommentsByPostId(Integer postId) {
+		return commentsRepo.findAllByPostId(postId);
+	}
+	
+	public List<Comment> getAllCommentReplies(Integer commentId) {
+		return commentsRepo.findAllByCommentedOnId(commentId);
+	}
 }

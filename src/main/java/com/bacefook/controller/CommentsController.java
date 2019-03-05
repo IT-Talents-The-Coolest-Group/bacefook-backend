@@ -34,12 +34,18 @@ public class CommentsController {
 
 	@PostMapping("/comments")
 	public ResponseEntity<Object> addCommentToPost(@RequestParam("postId") Integer postId,
-			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request) throws UnauthorizedException {
-		int posterId = SessionManager.getLoggedUser(request).getId();// throw exception if no user in session
+			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request) 
+					throws UnauthorizedException {
+		// throw exception if no user in session
+		// TODO check if comment is a reply on another comment
 		// TODO validate if properties are not empty
-		Comment comment = new Comment(posterId, postId, commentContentDto.getContent(), LocalDateTime.now());
+		
+		int posterId = SessionManager.getLoggedUser(request).getId();
+		Comment comment = new Comment(posterId, postId, 
+				commentContentDto.getContent(), LocalDateTime.now());
 
-		commentsService.saveComment(comment);// TODO validate with status code
+		// TODO validate with status code
+		commentsService.saveComment(comment);
 		return new ResponseEntity<>(comment.getId(), HttpStatus.OK);
 	}
 
