@@ -10,9 +10,10 @@ import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
-public class PostDTO {
-	private String posterFullName;
-	private Integer sharesPostId;
+public class CommentDTO {
+	@NonNull
+	private Integer postId;
+//TODO commented on property
 	@NonNull
 	private String content;
 	@NonNull

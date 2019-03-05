@@ -24,6 +24,7 @@ import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
 import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
+import com.bacefook.utility.TimeConverter;
 
 @RestController
 public class PostsController {
@@ -59,7 +60,7 @@ public class PostsController {
 			String posterFullName = userService.
 					findUserById(post.getPosterId()).getFullName();
 			
-			String timeOfPosting = PostDTO.convertTimeToString(post.getPostingTime());
+			String timeOfPosting = TimeConverter.convertTimeToString(post.getPostingTime());
 			
 			PostDTO postDto = new PostDTO(posterFullName, 
 					post.getSharesPostId(), post.getContent(), timeOfPosting);
