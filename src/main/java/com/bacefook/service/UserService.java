@@ -88,6 +88,16 @@ public class UserService {
 		return users;
 	}
 	
-	
+	public List<User> searchUsersByName(String input) {
+		List<User> users = usersRepo.findAll();
+		List<User> matches = new LinkedList<User>();
+		
+		for (User user : users) {
+			if (user.getFullName().contains(input)) {
+				matches.add(user);
+			}
+		}
+		return matches;
+	}
 	
 }
