@@ -30,9 +30,11 @@ public class UserController {
 	private GenderService genderService;
 
 	@PostMapping("/users/changepassword")
-	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UnauthorizedException,
-			ElementNotFoundException {
+	public void changeUserPassword(@RequestBody 
+			ChangePasswordDTO passDto, HttpServletRequest request)
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, 
+			UnauthorizedException, ElementNotFoundException {
+		
 		new UserValidation().validate(passDto);
 		int userId = SessionManager.getLoggedUser(request);
 		if (userId != -1) {

@@ -20,14 +20,16 @@ import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
 import com.bacefook.service.PostService;
-
+import com.bacefook.service.UserService;
 
 @RestController
 public class PostsController {
 
 	@Autowired
 	private PostService postsService;
-
+	@Autowired
+	private UserService userService;
+	
 	@PostMapping("/posts")
 	public int addPostToUser(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
 			throws UnauthorizedException { // Exceptions
@@ -45,14 +47,23 @@ public class PostsController {
 	}
 
 	@GetMapping("/posts")
-	public List<PostDTO> getAllPostsByUser(HttpServletRequest request) throws UnauthorizedException {
+	public List<PostDTO> getAllPostsByUser(HttpServletRequest request) 
+			throws UnauthorizedException, ElementNotFoundException {
 		int posterId = SessionManager.getLoggedUser(request);
+		
 		if (posterId != -1) {
 			List<Post> posts = postsService.findAllPostsByUserId(posterId);
 			List<PostDTO> returnedPosts = new ArrayList<>();
+			
 			for (Post post : posts) {
-				PostDTO postDto = new PostDTO(post.getPosterId(), post.getSharesPostId(), post.getContent(),
-						post.getPostingTime());
+				String posterFullName = userService.
+						findUserById(post.getPosterId()).getFullName();
+				
+				String timeOfPosting = PostDTO.convertTimeToString(post.getPostingTime());
+				
+				PostDTO postDto = new PostDTO(posterFullName, 
+						post.getSharesPostId(), post.getContent(), timeOfPosting);
+				
 				returnedPosts.add(postDto);
 			}
 			return returnedPosts;
