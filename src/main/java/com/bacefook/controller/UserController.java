@@ -1,10 +1,13 @@
 package com.bacefook.controller;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,67 +31,76 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private GenderService genderService;
+	
+	@GetMapping("/")
+	public void startingPage(HttpServletResponse response) throws IOException {
+		response.sendRedirect("https://github.com/IT-Talents-The-Coolest-Group/bacefook-backend/blob/master/README.md");
+	}
 
 	@PostMapping("/users/changepassword")
 	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UnauthorizedException,
 			ElementNotFoundException {
 		new UserValidation().validate(passDto);
-		int userId = SessionManager.getLoggedUser(request);
-		if (userId != -1) {
-			User user = userService.findUserById((Integer) userId);
-			String oldPass = Cryptography.cryptSHA256(passDto.getOldPassword());
-			if (user.getPassword().matches(oldPass)) {
-				user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
-				userService.saveUser(user);
-			} else {
-				throw new InvalidUserCredentialsException("Wrong password!");
-			}
+		User user = SessionManager.getLoggedUser(request);
+//			User user = userService.findUserById((Integer) user);
+		String oldPass = Cryptography.cryptSHA256(passDto.getOldPassword());
+		if (user.getPassword().matches(oldPass)) {
+			user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
+			userService.saveUser(user);
 		} else {
-			throw new UnauthorizedException("You are not logged in! Please log in before changing your password.");
+			throw new InvalidUserCredentialsException("Wrong password!");
 		}
 	}
 
-	@PostMapping("signup")
+	@PostMapping("/signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
-			throws InvalidUserCredentialsException, ElementNotFoundException, NoSuchAlgorithmException {
+			throws InvalidUserCredentialsException, ElementNotFoundException, NoSuchAlgorithmException,
+			UnauthorizedException {
 
 		new UserValidation().validate(signUp);
+		if (!SessionManager.isLogged(request)) {
+			// TODO check if you are logged
+			Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
 
-		Integer genderId = genderService.findByGenderName(signUp.getGender()).getId();
+			if (userService.emailIsTaken(signUp.getEmail())) {
+				throw new InvalidUserCredentialsException("That email is already taken!");
+			}
+			String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
 
-		if (userService.emailIsTaken(signUp.getEmail())) {
-			throw new InvalidUserCredentialsException("That email is already taken!");
+			User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(),
+					encodedPassword, signUp.getBirthday());
+			SessionManager.signInUser(request, user);
+			return userService.saveUser(user);
+		} else {
+			throw new UnauthorizedException("Please log out before you can register!");
 		}
-		String encodedPassword = Cryptography.cryptSHA256(signUp.getPassword());
-
-		User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(), encodedPassword,
-				signUp.getBirthday());
-
-		SessionManager.signInUser(request, user.getId());
-		return userService.saveUser(user);
 	}
 
 	@PostMapping("/login")
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException {
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException,
+			UnauthorizedException {
+		if (!SessionManager.isLogged(request)) {
+			new UserValidation().validate(login);
+			User user = userService.findUserByEmail(login.getEmail());
 
-		new UserValidation().validate(login);
-		User user = userService.findUserByEmail(login.getEmail());
-
-		if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
+			if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
 //			response.setHeader("location", "https://google.bg");
 //			HttpHeaders headers = new HttpHeaders();
-			SessionManager.signInUser(request, user.getId());
-			return user.getId();
+				SessionManager.signInUser(request, user);
+				return user.getId();
+			} else {
+				throw new InvalidUserCredentialsException("Wrong login credentials!");
+			}
 		} else {
-			throw new InvalidUserCredentialsException("Wrong login credentials!");
+			throw new UnauthorizedException("Log out first before you log in!");
 		}
 	}
 
 	@PostMapping("/logout")
 	public String logout(HttpServletRequest request) throws UnauthorizedException {
-		if (SessionManager.getLoggedUser(request) != -1) {
+		if (SessionManager.isLogged(request)) {
 			String message = SessionManager.logOutUser(request);
 			return message;
 		} else {
