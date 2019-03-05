@@ -43,7 +43,7 @@ public class PostsController {
 		postsService.likePost(userId, postId);
 	}
 
-	@GetMapping("/likes")
+	@GetMapping("/postlikes")
 	public ResponseEntity<List<FriendsListDTO>> getAllUsersWhoLikedPost(@RequestParam("postId") Integer postId) {
 		List<User> users = postsService.getAllUsersWhoLikedAPostById(postId); // TODO should we check if user is logged
 		List<FriendsListDTO> returnUsers = new ArrayList<FriendsListDTO>();
@@ -76,7 +76,7 @@ public class PostsController {
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
 
 		// TODO check if user is friend with poster
-		SessionManager.getLoggedUser(request);
+//		SessionManager.getLoggedUser(request);
 
 		List<Post> posts = postsService.findAllPostsByUserId(posterId);
 		List<PostDTO> returnedPosts = new ArrayList<>();
