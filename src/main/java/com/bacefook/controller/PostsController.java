@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,7 +34,7 @@ public class PostsController {
 	private UserService userService;
 	
 	@PostMapping("/posts")
-	public int addPostToUser(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
+	public ResponseEntity<Object> addPostToUser(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
 			throws UnauthorizedException { // Exceptions
 		int posterId = SessionManager.getLoggedUser(request).getId();
 		// TODO validate if properties are not empty
@@ -40,14 +42,14 @@ public class PostsController {
 		// return int
 		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
 		postsService.savePost(post);
-		return post.getId();
+		return new ResponseEntity<>(post.getId(), HttpStatus.OK);
 //		} else {
 //			throw new UnauthorizedException("You are not logged in! Please log in before you can add a post.");
 //		}
 	}
 
 	@GetMapping("/posts")
-	public List<PostDTO> getAllPostsByUser(@RequestHeader("posterId") int posterId,HttpServletRequest request) 
+	public ResponseEntity<List<PostDTO>> getAllPostsByUser(@RequestHeader("posterId") int posterId,HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
 	// TODO check if user is logged and if user is friend with poster
 	//		int posterId = SessionManager.getLoggedUser(request).getId();
@@ -64,7 +66,7 @@ public class PostsController {
 			
 			returnedPosts.add(postDto);
 		}
-		return returnedPosts;
+		return new ResponseEntity<>(returnedPosts, HttpStatus.OK);
 //		} else {
 //			throw new UnauthorizedException("You are not logged! Please log in before you can see your posts.");
 //		}

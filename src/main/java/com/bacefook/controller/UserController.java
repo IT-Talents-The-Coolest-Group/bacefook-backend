@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,7 +58,7 @@ public class UserController {
 	}
 
 	@PostMapping("/signup")
-	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
+	public ResponseEntity<Integer> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
 			throws InvalidUserCredentialsException, ElementNotFoundException, NoSuchAlgorithmException,
 			UnauthorizedException {
 
@@ -73,14 +75,14 @@ public class UserController {
 			User user = new User(genderId, signUp.getEmail(), signUp.getFirstName(), signUp.getLastName(),
 					encodedPassword, signUp.getBirthday());
 			SessionManager.signInUser(request, user);
-			return userService.saveUser(user);
+			return new ResponseEntity<>(userService.saveUser(user), HttpStatus.OK);
 		} else {
 			throw new UnauthorizedException("Please log out before you can register!");
 		}
 	}
 
 	@PostMapping("/login")
-	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
+	public ResponseEntity<Integer> login(@RequestBody LoginDTO login, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException,
 			UnauthorizedException {
 		if (!SessionManager.isLogged(request)) {
@@ -91,7 +93,7 @@ public class UserController {
 //			response.setHeader("location", "https://google.bg");
 //			HttpHeaders headers = new HttpHeaders();
 				SessionManager.signInUser(request, user);
-				return user.getId();
+				return new ResponseEntity<>(user.getId(), HttpStatus.OK);
 			} else {
 				throw new InvalidUserCredentialsException("Wrong login credentials!");
 			}
@@ -101,10 +103,10 @@ public class UserController {
 	}
 
 	@PostMapping("/logout")
-	public String logout(HttpServletRequest request) throws UnauthorizedException {
+	public ResponseEntity<String> logout(HttpServletRequest request) throws UnauthorizedException {
 		if (SessionManager.isLogged(request)) {
 			String message = SessionManager.logOutUser(request);
-			return message;
+			return new ResponseEntity<>(message, HttpStatus.OK);
 		} else {
 			throw new UnauthorizedException("You are not logged in!");
 		}
