@@ -11,4 +11,6 @@ import com.bacefook.model.Post;
 public interface PostsRepository extends JpaRepository<Post, Integer> {
 	public List<Post> findAllByPosterId(Integer posterId);
 
+	public List<Post> findAllBySharesPostId(Integer sharesPostId);
+
 }

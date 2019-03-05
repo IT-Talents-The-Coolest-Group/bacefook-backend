@@ -7,6 +7,7 @@ import com.bacefook.model.User;
 
 @Repository
 public interface UsersRepository extends JpaRepository<User, Integer> {
+	
 	public User findByEmail(String email);
 	
 }

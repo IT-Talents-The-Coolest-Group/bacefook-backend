@@ -51,8 +51,10 @@ public class UserService {
 		return usersRepo.save(user).getId();
 	}
 	
-	public void makeRelation(Integer senderId, Integer receiverId) throws RelationException, ElementNotFoundException {
-		Relation friendRequest = new Relation(senderId, receiverId);
+	public void sendFriendRequest(Integer senderId, Integer receiverId) 
+			throws RelationException, ElementNotFoundException {
+		
+		Relation friendRequest = new Relation(senderId, receiverId, 0);
 		
 		if (!usersRepo.existsById(senderId) || !usersRepo.existsById(receiverId)) {
 			throw new ElementNotFoundException("A user with that ID does not exist!");
@@ -66,6 +68,12 @@ public class UserService {
 		}
 	}
 
+	public void confirmFriendRequest(Integer receiverId, Integer senderId) {
+		Relation relation = relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId);
+		relation.setIsConfirmed(1);
+		relationsRepo.save(relation);
+	}
+	
 	public List<User> findAllUsersFromRequestsTo(Integer receiverId) {
 		List<Relation> relations = relationsRepo.findAllByReceiverId(receiverId);
 				
@@ -79,5 +87,7 @@ public class UserService {
 		}
 		return users;
 	}
+	
+	
 	
 }

@@ -28,5 +28,6 @@ public class Relation {
 	@NonNull
 	@Column(name = "receiver_id")
 	private Integer receiverId;
-	
+	@NonNull
+	private Integer isConfirmed;
 }
