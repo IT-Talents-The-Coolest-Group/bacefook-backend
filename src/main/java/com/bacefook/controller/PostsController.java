@@ -38,23 +38,23 @@ public class PostsController {
 			throws UnauthorizedException { // Exceptions
 		int posterId = SessionManager.getLoggedUser(request).getId();
 		// TODO validate if properties are not empty
-		// TODO should we cast posterId from Object or method getLoggedUser should
-		// return int
+		
 		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
 		postsService.savePost(post);
 		return new ResponseEntity<>(post.getId(), HttpStatus.OK);
-//		} else {
-//			throw new UnauthorizedException("You are not logged in! Please log in before you can add a post.");
-//		}
 	}
 
 	@GetMapping("/posts")
-	public ResponseEntity<List<PostDTO>> getAllPostsByUser(@RequestHeader("posterId") int posterId,HttpServletRequest request) 
+	public ResponseEntity<List<PostDTO>> getAllPostsByUser(@RequestHeader("posterId") 
+		int posterId,HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
-	// TODO check if user is logged and if user is friend with poster
-	//		int posterId = SessionManager.getLoggedUser(request).getId();
+		
+		// TODO check if user is friend with poster
+		SessionManager.getLoggedUser(request);
+	
 		List<Post> posts = postsService.findAllPostsByUserId(posterId);
 		List<PostDTO> returnedPosts = new ArrayList<>();
+		
 		for (Post post : posts) {
 			String posterFullName = userService.
 					findUserById(post.getPosterId()).getFullName();
@@ -67,9 +67,7 @@ public class PostsController {
 			returnedPosts.add(postDto);
 		}
 		return new ResponseEntity<>(returnedPosts, HttpStatus.OK);
-//		} else {
-//			throw new UnauthorizedException("You are not logged! Please log in before you can see your posts.");
-//		}
+
 	}
 
 	// get post by id
