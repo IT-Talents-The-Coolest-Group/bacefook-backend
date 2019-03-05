@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.management.relation.RelationException;
 
@@ -67,22 +66,17 @@ public class UserService {
 		}
 	}
 
-	
 	public List<User> findAllUsersFromRequestsTo(Integer receiverId) {
-		List<Optional<User>> optionalUsers = 
-				relationsRepo
-				.findAllByReceiverId(receiverId)
-				.stream()
-				.map(relation -> usersRepo.findById(relation.getSenderId()))
-				.collect(Collectors.toList());
-		
+		List<Relation> relations = relationsRepo.findAllByReceiverId(receiverId);
+				
 		List<User> users = new LinkedList<User>();
-		for (Optional<User> optional : optionalUsers) {
-			if (optional.isPresent()) {
-				users.add(optional.get());
+		
+		for (Relation relation : relations) {
+			Optional<User> optionalUser = usersRepo.findById(relation.getSenderId());
+			if (optionalUser.isPresent()) {
+				users.add(optionalUser.get());
 			}
 		}
-		
 		return users;
 	}
 	
