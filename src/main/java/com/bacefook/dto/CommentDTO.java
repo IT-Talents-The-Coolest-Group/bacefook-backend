@@ -11,8 +11,8 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 public class CommentDTO {
+	private Integer id;
 	private String posterFullName;
-
 	private Integer comentedOnId;
 	@NonNull
 	private String content;

@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bacefook.dao.CommentDAO;
 import com.bacefook.dto.CommentContentDTO;
 import com.bacefook.dto.CommentDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Comment;
+import com.bacefook.model.User;
 import com.bacefook.service.CommentService;
 import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
@@ -37,12 +39,32 @@ public class CommentsController {
 	private UserService userService;
 	@Autowired
 	private PostService postService;
-	
+
+	@Autowired
+	private CommentDAO dao;
+
 	@PostMapping("/commentlikes")
-	public void addLikeToPost(@RequestParam("commentId") Integer commentId, HttpServletRequest request)
-			throws UnauthorizedException {
+	public ResponseEntity<String> addLikeToComment(@RequestParam("commentId") Integer commentId,
+			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
 		int userId = SessionManager.getLoggedUser(request).getId();
-		commentsService.likeCommentById(userId, commentId);
+		commentsService.findCommentById(commentId);
+//		commentsService.likeCommentById(userId, commentId);
+		dao.addLikeToComment(commentId, userId);
+		return new ResponseEntity<String>("Comment " + commentId + " was liked", HttpStatus.OK);
+	}
+
+	@PostMapping("/commentreply")
+	public ResponseEntity<CommentDTO> addReplyToComment(@RequestParam("commentId") Integer commentId,
+			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request)
+			throws UnauthorizedException, ElementNotFoundException {
+		User user = SessionManager.getLoggedUser(request);
+		Comment comment = commentsService.findCommentById(commentId);
+		Comment reply = new Comment(null, user.getId(), comment.getPostId(), commentId, commentContentDto.getContent(),
+				LocalDateTime.now());
+		commentsService.saveComment(reply);
+		CommentDTO dto = new CommentDTO(reply.getId(), user.getFullName(), reply.getCommentedOnId(), reply.getContent(),
+				TimeConverter.convertTimeToString(reply.getPostingTime()));
+		return new ResponseEntity<CommentDTO>(dto, HttpStatus.OK);
 	}
 
 	@PostMapping("/comments")
@@ -94,8 +116,8 @@ public class CommentsController {
 
 			String timeOfPosting = TimeConverter.convertTimeToString(comment.getPostingTime());
 
-			CommentDTO commentDto = new CommentDTO(posterFullName, comment.getCommentedOnId(), comment.getContent(),
-					timeOfPosting);
+			CommentDTO commentDto = new CommentDTO(comment.getId(), posterFullName, comment.getCommentedOnId(),
+					comment.getContent(), timeOfPosting);
 
 			commentsOnPost.add(commentDto);
 		}
