@@ -1,6 +1,7 @@
 package com.bacefook.controller;
 
 import java.io.IOException;
+
 import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +30,7 @@ import com.bacefook.service.GenderService;
 import com.bacefook.service.UserService;
 import com.bacefook.utility.UserValidation;
 
+@CrossOrigin
 @RestController
 public class UserController {
 
@@ -35,18 +38,17 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private GenderService genderService;
-	
+
 	@GetMapping("/")
 	public void startingPage(HttpServletResponse response) throws IOException {
 		response.sendRedirect("https://github.com/IT-Talents-The-Coolest-Group/bacefook-backend/blob/master/README.md");
 	}
 
 	@PostMapping("/users/changepassword")
-	public void changeUserPassword(@RequestBody 
-			ChangePasswordDTO passDto, HttpServletRequest request)
-			throws InvalidUserCredentialsException, NoSuchAlgorithmException, 
-			UnauthorizedException, ElementNotFoundException {
-		
+	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
+			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UnauthorizedException,
+			ElementNotFoundException {
+
 		new UserValidation().validate(passDto);
 		User user = SessionManager.getLoggedUser(request);
 //			User user = userService.findUserById((Integer) user);
@@ -60,9 +62,9 @@ public class UserController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<String> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
-			throws InvalidUserCredentialsException, ElementNotFoundException, 
-			NoSuchAlgorithmException, UnauthorizedException {
+	public ResponseEntity<String> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request,
+			HttpServletResponse response) throws InvalidUserCredentialsException, ElementNotFoundException,
+			NoSuchAlgorithmException, UnauthorizedException, IOException {
 
 		new UserValidation().validate(signUp);
 		if (SessionManager.isLogged(request)) {
@@ -72,7 +74,7 @@ public class UserController {
 		if (userService.emailIsTaken(signUp.getEmail())) {
 			throw new InvalidUserCredentialsException("That email is already taken!");
 		}
-		
+
 		User user = new User();
 		new ModelMapper().map(signUp, user);
 		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
@@ -81,9 +83,10 @@ public class UserController {
 		SessionManager.signInUser(request, user);
 		userService.saveUser(user);
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("location", "/http://bacefook.herokuapp.com/home"); 
+		headers.add("location", "http://bacefook.herokuapp.com/home");
+		response.sendRedirect("http://bacefook.herokuapp.com/home");
 		return new ResponseEntity<String>(headers, HttpStatus.OK);
-		
+
 	}
 
 	@PostMapping("/login")

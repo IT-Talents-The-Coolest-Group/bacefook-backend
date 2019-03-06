@@ -12,10 +12,10 @@ public class SessionManager {
 
 	public static boolean isLogged(HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		if (session.isNew()) {
-			System.out.println("Session was just created");//TODO
-			return false;
-		}
+//		if (session.isNew()) {
+//			System.out.println("Session was just created");//TODO
+//			return false;
+//		}
 		return session.getAttribute(LOGGED_STATUS) != null;
 	}
 
