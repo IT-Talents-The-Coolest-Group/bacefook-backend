@@ -13,7 +13,7 @@ public class GenderService {
 	@Autowired
 	private GenderRepository genderRepo;
 	
-	public String findGenderById(Integer id) throws ElementNotFoundException {
+	public String findById(Integer id) throws ElementNotFoundException {
 		Gender gender = genderRepo.findById(id).get();
 		if (gender == null) {
 			throw new ElementNotFoundException("A gender with that id does not exist!");
@@ -21,7 +21,7 @@ public class GenderService {
 		return gender.getGenderName();
 	}
 	
-	public Gender findByGenderName(String genderName) throws ElementNotFoundException {
+	public Gender findByName(String genderName) throws ElementNotFoundException {
 		Gender gender = genderRepo.findByGenderName(genderName);
 		if (gender == null) {
 			throw new ElementNotFoundException("A gender with that name does not exist!");

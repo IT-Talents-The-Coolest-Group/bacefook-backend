@@ -8,7 +8,7 @@ import lombok.NonNull;
 @Data
 public class HomePageDTO {
 	@NonNull
-	private UserDTO loggedUser;
+	private UserSummaryDTO loggedUser;
 	@NonNull
 	private List<PostDTO> allPosts;
 }

@@ -26,19 +26,19 @@ public class PostService {
 	@Autowired
 	private UsersRepository usersRepo;
 
-	public List<Post> findAllPostsByUser(User poster) {
+	public List<Post> findAllByUser(User poster) {
 		return postsRepo.findAllByPosterId(poster.getId());
 	}
 	
-	public List<Post> findAllPostsByUserId(Integer posterId){
+	public List<Post> findAllByUserId(Integer posterId){
 		return postsRepo.findAllByPosterId(posterId);
 	}
 	
-	public void savePost(Post post) {
+	public void save(Post post) {
 		postsRepo.save(post);
 	}
 	
-	public Post findPostById(Integer postId) throws ElementNotFoundException {
+	public Post findById(Integer postId) throws ElementNotFoundException {
 		try {
 		Post post = postsRepo.findById(postId).get();
 		return post;
@@ -47,7 +47,7 @@ public class PostService {
 		}
 	}
 
-	public List<User> getAllUsersWhoLikedAPostById(Integer postId) {
+	public List<User> findAllUsersWhoLikedAPost(Integer postId) {
 		List<PostLike> postLikes = postLikesRepo.findAllByPostId(postId);
 		
 		List<User> users = new LinkedList<>();
@@ -66,7 +66,7 @@ public class PostService {
 		postLikesRepo.save(new PostLike(userId, postId));
 	}
 	
-	public List<Post> getAllPostsWhichSharePostId(Integer postId) {
+	public List<Post> findAllWhichSharePostId(Integer postId) {
 		return postsRepo.findAllBySharesPostId(postId);
 	}
 	

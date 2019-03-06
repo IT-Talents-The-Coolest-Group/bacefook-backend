@@ -19,7 +19,7 @@ public class PhotoHostingService {
 	private PhotosRepository photosRepo;
 	private static final Cloudinary cloudinary = new Cloudinary("cloudinary://763529519438114:rCTrP8RNpMEiCVzYZNnZlVx5sxw@bacefook");
 	
-	public String savePhoto(Integer postId, File file) throws IOException {
+	public String save(Integer postId, File file) throws IOException {
 		@SuppressWarnings("rawtypes")
 		Map response = cloudinary.uploader().upload(file, ObjectUtils.asMap("public_id", file.getName()));
 		String url = (String) response.get("url");

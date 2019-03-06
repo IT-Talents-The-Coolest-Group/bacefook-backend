@@ -45,6 +45,9 @@ public class User {
 	@NonNull
 	private LocalDate birthday;
 
+//	@NonNull // TODO implement
+//	private String profilePhotoUrl;
+	
 	/* Makes sure that UserRepository gets all friends
 	 * of this user from the 'relations' table */
 	@ManyToMany(
@@ -56,6 +59,7 @@ public class User {
     	inverseJoinColumns = { @JoinColumn(name = "receiver_id") })
 	@WhereJoinTable( 
 		clause = "is_confirmed = 1")
+
 	private Set<User> friends;
 
 	public String getFullName() {

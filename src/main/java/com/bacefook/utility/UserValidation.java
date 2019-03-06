@@ -16,19 +16,23 @@ public class UserValidation {
 	private final static String EMAIL_PATTERN = "^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,5}$";
 	private final static String PASSWORD_PATTERN = "^[a-zA-Z0-9]{8,30}$";
 
-	private void validateEmail(String email) throws InvalidUserCredentialsException {
+	private UserValidation() {
+		// this is to disable instances
+	}
+	
+	private static void validateEmail(String email) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(email) || !email.matches(EMAIL_PATTERN)) {
 			throw new InvalidUserCredentialsException("Invalid email format!");
 		}
 	}
 
-	public void validatePassword(String password) throws InvalidUserCredentialsException {
+	public static void validatePassword(String password) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(password) || !password.matches(PASSWORD_PATTERN)) {
 			throw new InvalidUserCredentialsException("Invalid password, must only contain latin letters and numbers");
 		}
 	}
 
-	private void validateBirthday(LocalDate birthday) throws InvalidUserCredentialsException{
+	private static void validateBirthday(LocalDate birthday) throws InvalidUserCredentialsException{
 		Period period = Period.between(birthday, LocalDate.now());
 		if (period.getYears() >= MAX_AGE && period.getYears() < MIN_AGE) {
 			throw new InvalidUserCredentialsException(
@@ -36,23 +40,23 @@ public class UserValidation {
 		}
 	}
 
-	private void validateName(String name) throws InvalidUserCredentialsException {
+	private static void validateName(String name) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(name) || name.length() < MIN_NAMES_LENGTH) {
 			throw new InvalidUserCredentialsException("Invalid name, must be longer than " + MIN_NAMES_LENGTH + "!");
 		}
 	}
 
-	private boolean isNullOrEmpty(String string) {
+	private static boolean isNullOrEmpty(String string) {
 		return string == null || string.isEmpty();
 	}
 
-	public void confirmPassword(String password, String passwordConfirmation) throws InvalidUserCredentialsException {
+	public static void confirmPassword(String password, String passwordConfirmation) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(password) || !password.equals(passwordConfirmation)) {
 			throw new InvalidUserCredentialsException("Passwords do not match!");
 		}
 	}
 
-	public void validate(SignUpDTO signUp) throws InvalidUserCredentialsException {
+	public static void validate(SignUpDTO signUp) throws InvalidUserCredentialsException {
 		validateName(signUp.getFirstName());
 		validateName(signUp.getLastName());
 		validateEmail(signUp.getEmail());
@@ -61,7 +65,7 @@ public class UserValidation {
 		validateBirthday(signUp.getBirthday());
 	}
 
-	public void validate(LoginDTO login) throws InvalidUserCredentialsException {
+	public static void validate(LoginDTO login) throws InvalidUserCredentialsException {
 		if (isNullOrEmpty(login.getEmail())) {
 			throw new InvalidUserCredentialsException("Email must not be empty!");
 		}
@@ -71,7 +75,7 @@ public class UserValidation {
 		}
 	}
 	
-	public void validate(ChangePasswordDTO passChange) throws InvalidUserCredentialsException {
+	public static void validate(ChangePasswordDTO passChange) throws InvalidUserCredentialsException {
 		validatePassword(passChange.getNewPassword());
 		confirmPassword(passChange.getNewPassword(), passChange.getConfirmPassword());		
 	}

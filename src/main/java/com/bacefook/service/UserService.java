@@ -24,7 +24,7 @@ public class UserService {
 	@Autowired 
 	private RelationsRepository relationsRepo;
 
-	public User findUserByEmail(String email) throws ElementNotFoundException {
+	public User findByEmail(String email) throws ElementNotFoundException {
 		User user = usersRepo.findByEmail(email);
 		
 		if (user == null) {
@@ -37,7 +37,7 @@ public class UserService {
 		return usersRepo.findByEmail(email) != null;
 	}
 	
-	public User findUserById(Integer id) throws ElementNotFoundException {
+	public User findById(Integer id) throws ElementNotFoundException {
 		try {
 			User user = usersRepo.findById(id).get();
 			return user;
@@ -47,7 +47,7 @@ public class UserService {
 		}
 	}
 	
-	public Integer saveUser(User user) {
+	public Integer save(User user) {
 		return usersRepo.save(user).getId();
 	}
 	
@@ -74,7 +74,7 @@ public class UserService {
 		relationsRepo.save(relation);
 	}
 	
-	public List<User> findAllUsersFromRequestsTo(Integer receiverId) {
+	public List<User> findAllFromRequestsTo(Integer receiverId) {
 		List<Relation> relations = relationsRepo.findAllByReceiverId(receiverId);
 				
 		List<User> users = new LinkedList<User>();
@@ -88,7 +88,7 @@ public class UserService {
 		return users;
 	}
 	
-	public List<User> searchUsersByName(String input) {
+	public List<User> searchByName(String input) {
 		List<User> users = usersRepo.findAll();
 		List<User> matches = new LinkedList<User>();
 		

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.model.Comment;
-import com.bacefook.repository.CommentLikesRepository;
 import com.bacefook.repository.CommentsRepository;
 
 @Service
@@ -16,18 +15,12 @@ public class CommentService {
 	
 	@Autowired
 	private CommentsRepository commentsRepo;
-	@Autowired
-	private CommentLikesRepository commentLikesRepo;
 	
-	public void saveComment(Comment comment) {
+	public void save(Comment comment) {
 		commentsRepo.save(comment);
 	}
 	
-	public void likeCommentById(Integer userId, Integer commentId) {
-		// move dao here
-	}
-	
-	public Comment findCommentById(Integer commentId) throws ElementNotFoundException {
+	public Comment findById(Integer commentId) throws ElementNotFoundException {
 		try {
 			return commentsRepo.findById(commentId).get();
 		}
@@ -36,14 +29,12 @@ public class CommentService {
 		}
 	}
 	
-	public List<Comment> getAllCommentsByPostId(Integer postId) {
+	public List<Comment> findAllByPostId(Integer postId) {
 		return commentsRepo.findAllByPostId(postId);
 	}
 	
-	public List<Comment> getAllCommentReplies(Integer commentId) {
+	public List<Comment> findAllRepliesTo(Integer commentId) {
 		return commentsRepo.findAllByCommentedOnId(commentId);
 	}
-
-
 
 }

@@ -28,11 +28,17 @@ public class PhotosController {
 			File file = Files.createTempFile("temp", input.getOriginalFilename()).toFile();
 			input.transferTo(file);
 
-			String imageUrl = photoService.savePhoto(postId, file);
+			String imageUrl = photoService.save(postId, file);
 			return new ResponseEntity<String>((String) imageUrl, HttpStatus.OK);
 		} 
 		catch (IOException e) {
 			return new ResponseEntity<String>("Could not your process image, sorry!", HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	// TODO update profile photo
+	
+	// TODO update cover photo
+	
+	// TODO get all photos by album name
 }
