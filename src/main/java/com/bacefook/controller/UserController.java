@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -43,6 +42,11 @@ public class UserController {
 	public void startingPage(HttpServletResponse response) throws IOException {
 		response.sendRedirect("https://github.com/IT-Talents-The-Coolest-Group/bacefook-backend/blob/master/README.md");
 	}
+	
+	@GetMapping("/home")
+	public void homePage(HttpServletRequest request) throws UnauthorizedException {
+		User user = SessionManager.getLoggedUser(request);
+	}
 
 	@PostMapping("/users/changepassword")
 	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
@@ -62,7 +66,7 @@ public class UserController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<String> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request,
+	public ResponseEntity<Integer> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request,
 			HttpServletResponse response) throws InvalidUserCredentialsException, ElementNotFoundException,
 			NoSuchAlgorithmException, UnauthorizedException, IOException {
 
@@ -81,11 +85,8 @@ public class UserController {
 		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
 
 		SessionManager.signInUser(request, user);
-		userService.saveUser(user);
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("location", "http://bacefook.herokuapp.com/home");
-		response.sendRedirect("http://bacefook.herokuapp.com/home");
-		return new ResponseEntity<String>(headers, HttpStatus.OK);
+		
+		return new ResponseEntity<Integer>(userService.saveUser(user), HttpStatus.OK);
 
 	}
 
