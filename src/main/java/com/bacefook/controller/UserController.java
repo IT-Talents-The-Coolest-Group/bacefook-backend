@@ -3,6 +3,8 @@ package com.bacefook.controller;
 import java.io.IOException;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.ChangePasswordDTO;
+import com.bacefook.dto.HomePageDTO;
 import com.bacefook.dto.LoginDTO;
+import com.bacefook.dto.PostDTO;
 import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.UserDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
@@ -40,12 +45,19 @@ public class UserController {
 
 	@GetMapping("/")
 	public void startingPage(HttpServletResponse response) throws IOException {
-		response.sendRedirect("https://github.com/IT-Talents-The-Coolest-Group/bacefook-backend/blob/master/README.md");
+		response.sendRedirect("https://bacefookcommunity.postman.co/collections/6778985-5d93e005-f4f3-49fb-bc1d-956ce5e813fa?workspace=1bf0d2e0-4007-4e35-8219-38fec2a53b9d&fbclid=IwAR3xRCIhE9w4EKR-YEC2Hvt111icy21wEpQ5JgQgvjzVguz_OIfLa2i8fJs");
 	}
-	
+
 	@GetMapping("/home")
-	public void homePage(HttpServletRequest request) throws UnauthorizedException {
-		User user = SessionManager.getLoggedUser(request);
+	public ResponseEntity<HomePageDTO> homePage(HttpServletRequest request) throws UnauthorizedException {
+		User loggedUser = SessionManager.getLoggedUser(request);
+
+		UserDTO user = new UserDTO(loggedUser.getFirstName(), "");// TODO profile picture
+
+		List<PostDTO> allFriendsPosts = new ArrayList<>();
+		HomePageDTO home = new HomePageDTO(user, allFriendsPosts);
+
+		return new ResponseEntity<HomePageDTO>(home, HttpStatus.OK);
 	}
 
 	@PostMapping("/users/changepassword")
@@ -85,7 +97,7 @@ public class UserController {
 		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
 
 		SessionManager.signInUser(request, user);
-		
+
 		return new ResponseEntity<Integer>(userService.saveUser(user), HttpStatus.OK);
 
 	}

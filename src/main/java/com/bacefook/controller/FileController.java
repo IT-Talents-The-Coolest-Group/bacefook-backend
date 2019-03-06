@@ -14,26 +14,26 @@ import com.bacefook.service.FileStorageService;
 @RestController
 public class FileController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
-	
-	 @Autowired
-	 private FileStorageService fileStorageService;
-	 
-	 @PostMapping("/uploadfile")
-	    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-	        String fileName = fileStorageService.storeFile(file);
-
-	        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-	                .path("/downloadfile/")
-	                .path(fileName)
-	                .toUriString();
-
-	        return new UploadFileResponse(fileName, fileDownloadUri,
-	                file.getContentType(), file.getSize());
-	    }
-
-	public static Logger getLogger() {
-		return logger;
-	}
-	
+//	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+//	
+//	 @Autowired
+//	 private FileStorageService fileStorageService;
+//	 
+//	 @PostMapping("/uploadfile")
+//	    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
+//	        String fileName = fileStorageService.storeFile(file);
+//
+//	        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+//	                .path("/downloadfile/")
+//	                .path(fileName)
+//	                .toUriString();
+//
+//	        return new UploadFileResponse(fileName, fileDownloadUri,
+//	                file.getContentType(), file.getSize());
+//	    }
+//
+//	public static Logger getLogger() {
+//		return logger;
+//	}
+//	
 }
