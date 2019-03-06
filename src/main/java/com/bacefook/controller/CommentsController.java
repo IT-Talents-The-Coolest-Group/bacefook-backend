@@ -30,11 +30,11 @@ import com.bacefook.utility.TimeConverter;
 @CrossOrigin
 @RestController
 public class CommentsController {
+	
 	@Autowired
-	CommentService commentsService;
+	private CommentService commentsService;
 	@Autowired
 	private UserService userService;
-
 	@Autowired
 	private PostService postService;
 	

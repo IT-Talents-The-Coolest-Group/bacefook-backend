@@ -6,7 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

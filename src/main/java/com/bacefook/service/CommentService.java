@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.model.Comment;
-import com.bacefook.model.CommentLike;
 import com.bacefook.repository.CommentLikesRepository;
 import com.bacefook.repository.CommentsRepository;
 
@@ -25,8 +24,7 @@ public class CommentService {
 	}
 	
 	public void likeCommentById(Integer userId, Integer commentId) {
-		CommentLike like = new CommentLike(userId, commentId);
-		commentLikesRepo.save(like);
+		// move dao here
 	}
 	
 	public Comment findCommentById(Integer commentId) throws ElementNotFoundException {
