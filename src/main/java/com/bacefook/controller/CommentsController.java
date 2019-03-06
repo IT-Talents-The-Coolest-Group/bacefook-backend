@@ -35,6 +35,13 @@ public class CommentsController {
 
 	@Autowired
 	private PostService postService;
+	
+	@PostMapping("/commentlikes")
+	public void addLikeToPost(@RequestParam("commentId") Integer commentId, HttpServletRequest request)
+			throws UnauthorizedException {
+		int userId = SessionManager.getLoggedUser(request).getId();
+		commentsService.likeCommentById(userId, commentId);
+	}
 
 	@PostMapping("/comments")
 	public ResponseEntity<Object> addCommentToPost(@RequestParam("postId") Integer postId,

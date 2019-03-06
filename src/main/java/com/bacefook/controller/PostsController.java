@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,7 +35,7 @@ public class PostsController {
 	@Autowired
 	private UserService userService;
 
-	@PostMapping("/likes")
+	@PostMapping("/postlikes")
 	public void addLikeToPost(@RequestParam("postId") Integer postId, HttpServletRequest request)
 			throws UnauthorizedException {
 		int userId = SessionManager.getLoggedUser(request).getId();
@@ -72,7 +71,7 @@ public class PostsController {
 	}
 
 	@GetMapping("/posts")
-	public ResponseEntity<List<PostDTO>> getAllPostsByUser(@RequestHeader("posterId") int posterId,
+	public ResponseEntity<List<PostDTO>> getAllPostsByUser(@RequestParam("posterId") int posterId,
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
 
 		// TODO check if user is friend with poster
@@ -86,7 +85,7 @@ public class PostsController {
 
 			String timeOfPosting = TimeConverter.convertTimeToString(post.getPostingTime());
 
-			PostDTO postDto = new PostDTO(posterFullName, post.getSharesPostId(), post.getContent(), timeOfPosting);
+			PostDTO postDto = new PostDTO(post.getId(),posterFullName, post.getSharesPostId(), post.getContent(), timeOfPosting);
 
 			returnedPosts.add(postDto);
 		}
