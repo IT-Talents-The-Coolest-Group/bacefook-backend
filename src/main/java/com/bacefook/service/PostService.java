@@ -66,4 +66,11 @@ public class PostService {
 		postLikesRepo.save(new PostLike(userId, postId));
 	}
 	
+	public List<Post> getAllPostsWhichSharePostId(Integer postId) {
+		return postsRepo.findAllBySharesPostId(postId);
+	}
+	
+	
+
+
 }

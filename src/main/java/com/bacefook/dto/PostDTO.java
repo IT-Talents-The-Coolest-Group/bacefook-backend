@@ -11,6 +11,8 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 public class PostDTO {
+	@NonNull
+	private Integer postId;
 	private String posterFullName;
 	private Integer sharesPostId;
 	@NonNull

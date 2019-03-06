@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +60,7 @@ public class UserController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<Integer> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
+	public ResponseEntity<String> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request)
 			throws InvalidUserCredentialsException, ElementNotFoundException, 
 			NoSuchAlgorithmException, UnauthorizedException {
 
@@ -78,7 +79,10 @@ public class UserController {
 		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
 
 		SessionManager.signInUser(request, user);
-		return new ResponseEntity<>(userService.saveUser(user), HttpStatus.OK);
+		userService.saveUser(user);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("location", "/http://bacefook.herokuapp.com/home"); 
+		return new ResponseEntity<String>(headers, HttpStatus.OK);
 		
 	}
 

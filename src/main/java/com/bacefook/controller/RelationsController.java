@@ -24,31 +24,32 @@ import com.bacefook.service.UserService;
 public class RelationsController {
 	@Autowired
 	private UserService userService;
-	
+
 	@GetMapping("{id}/friends")
-	public ResponseEntity<Set<FriendsListDTO>> getFriendsOfUser(@PathVariable Integer id) throws ElementNotFoundException {
-		return new ResponseEntity<>(userService.findUserById(id).getFriends().stream().map(
-				user -> new FriendsListDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getFriends().size()))
+	public ResponseEntity<Set<FriendsListDTO>> getFriendsOfUser(@PathVariable Integer id)
+			throws ElementNotFoundException {
+		return new ResponseEntity<>(userService.findUserById(id).getFriends().stream()
+				.map(user -> new FriendsListDTO(user.getFirstName(), user.getLastName(), user.getFriends().size()))
 				.collect(Collectors.toSet()), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("{id}/friendrequest")
-	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) 
+	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request)
 			throws RelationException, UnauthorizedException, ElementNotFoundException {
-		
-		//userService.makeRelation(SessionManager.getLoggedUser(request).getId(), id); // TODO fix session manager
+
+		// userService.makeRelation(SessionManager.getLoggedUser(request).getId(), id);
+		// // TODO fix session manager
 	}
 
 	@GetMapping("friendrequests")
 	public List<FriendsListDTO> getAllRequestsOfAUser(HttpServletRequest request) throws UnauthorizedException {
 		Integer receiverId = SessionManager.getLoggedUser(request).getId();
-		
-		return userService.findAllUsersFromRequestsTo(receiverId)
-				.stream().map(user -> new FriendsListDTO(user.getId(), 
-						user.getFirstName(), user.getLastName(), user.getFriends().size()))
+
+		return userService.findAllUsersFromRequestsTo(receiverId).stream()
+				.map(user -> new FriendsListDTO(user.getFirstName(), user.getLastName(), user.getFriends().size()))
 				.collect(Collectors.toList());
 	}
-	
+
 //	 TODO accept a friend request of a user
 //	 should change the relation column 'is_confirmed' to 1
 
