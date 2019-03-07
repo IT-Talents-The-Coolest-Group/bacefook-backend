@@ -28,7 +28,6 @@ import com.bacefook.model.Post;
 import com.bacefook.model.User;
 import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
-import com.bacefook.utility.TimeConverter;
 
 //@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -57,6 +56,8 @@ public class PostsController {
 		for (Post post : posts) {
 			PostDTO postDTO = new PostDTO();
 			this.mapper.map(post, postDTO);
+			String posterFullName = userService.findById(post.getPosterId()).getFullName();
+			postDTO.setPosterFullName(posterFullName);
 			allFriendsPosts.add(postDTO);
 		}
 		
@@ -119,10 +120,12 @@ public class PostsController {
 		for (Post post : posts) {
 			String posterFullName = userService.findById(post.getPosterId()).getFullName();
 
-			String timeOfPosting = TimeConverter.convertTimeToString(post.getPostingTime());
-
-			PostDTO postDto = new PostDTO(post.getId(), posterFullName, post.getSharesPostId(), post.getContent(),
-					timeOfPosting);
+//			String timeOfPosting = TimeConverter.convertTimeToString(post.getPostingTime());
+			PostDTO postDto = new PostDTO();
+			this.mapper.map(post, postDto);
+			postDto.setPosterFullName(posterFullName);
+//			PostDTO postDto = new PostDTO(post.getId(), posterFullName, post.getSharesPostId(), post.getContent(),
+//					timeOfPosting);
 
 			returnedPosts.add(postDto);
 		}

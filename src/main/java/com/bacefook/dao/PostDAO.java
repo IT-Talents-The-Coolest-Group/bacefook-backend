@@ -13,7 +13,7 @@ public class PostDAO {
 			"SELECT p.id AS post FROM relations r "
 			+ "RIGHT JOIN posts p ON(r.receiver_id = p.poster_id) "
 			+ "WHERE r.sender_id = ? AND r.is_confirmed = 1 "
-			+ "ORDER BY p.posting_time;";
+			+ "ORDER BY p.posting_time DESC;";
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;

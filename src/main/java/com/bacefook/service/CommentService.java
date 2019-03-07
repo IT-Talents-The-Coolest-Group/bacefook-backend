@@ -34,7 +34,7 @@ public class CommentService {
 	}
 	
 	public List<Comment> findAllRepliesTo(Integer commentId) {
-		return commentsRepo.findAllByCommentedOnId(commentId);
+		return commentsRepo.findAllByCommentedOnIdOrderByPostingTime(commentId);
 	}
 
 }
