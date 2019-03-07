@@ -2,10 +2,13 @@ package com.bacefook.controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.FriendsListDTO;
+import com.bacefook.dto.HomePageDTO;
 import com.bacefook.dto.PostContentDTO;
 import com.bacefook.dto.PostDTO;
+import com.bacefook.dto.UserDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
@@ -38,10 +43,38 @@ public class PostsController {
 	@Autowired
 	private UserService userService;
 
+	private ModelMapper mapper = new ModelMapper();
+
+	@GetMapping("/home")
+	public ResponseEntity<HomePageDTO> homePage(HttpServletRequest request)
+			throws UnauthorizedException, ElementNotFoundException {
+		Integer userId = SessionManager.getLoggedUser(request);
+		User loggedUser = userService.findUserById(userId);
+		UserDTO user = new UserDTO(loggedUser.getFirstName(), "");// TODO profile picture,cover photo
+		HashMap<String, UserDTO> userMap = new HashMap<>();
+		userMap.put("loggedUser", user);
+		List<Post> posts = postsService.findAllPostsFromFriends(userId);
+		List<PostDTO> allFriendsPosts = new ArrayList<PostDTO>(posts.size());
+		for (Post post : posts) {
+			PostDTO postDTO = new PostDTO();
+			this.mapper.map(post, postDTO);
+			allFriendsPosts.add(postDTO);
+		}
+		HashMap<String, List<PostDTO>> friendsPostsMap = new HashMap<>();
+		friendsPostsMap.put("friendsPosts", allFriendsPosts);
+		int friendsRequests = userService.findAllUsersFromRequestsTo(userId).size();
+		Map<String, Integer> requestsMap = new HashMap<>();
+		requestsMap.put("friendRequestsCount", friendsRequests);
+
+		HomePageDTO home = new HomePageDTO(userMap, friendsPostsMap);
+
+		return new ResponseEntity<HomePageDTO>(home, HttpStatus.OK);
+	}
+
 	@PostMapping("/postlikes")
 	public void addLikeToPost(@RequestParam("postId") Integer postId, HttpServletRequest request)
 			throws UnauthorizedException {
-		int userId = SessionManager.getLoggedUser(request).getId();
+		int userId = SessionManager.getLoggedUser(request);
 		postsService.likePost(userId, postId);
 	}
 
@@ -65,7 +98,7 @@ public class PostsController {
 	@PostMapping("/posts")
 	public ResponseEntity<Object> addPostToUser(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
 			throws UnauthorizedException { // Exceptions
-		int posterId = SessionManager.getLoggedUser(request).getId();
+		int posterId = SessionManager.getLoggedUser(request);
 		// TODO validate if properties are not empty
 
 		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
@@ -88,7 +121,8 @@ public class PostsController {
 
 			String timeOfPosting = TimeConverter.convertTimeToString(post.getPostingTime());
 
-			PostDTO postDto = new PostDTO(post.getId(),posterFullName, post.getSharesPostId(), post.getContent(), timeOfPosting);
+			PostDTO postDto = new PostDTO(post.getId(), posterFullName, post.getSharesPostId(), post.getContent(),
+					timeOfPosting);
 
 			returnedPosts.add(postDto);
 		}

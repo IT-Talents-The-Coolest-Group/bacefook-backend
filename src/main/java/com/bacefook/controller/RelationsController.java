@@ -45,7 +45,7 @@ public class RelationsController {
 
 	@GetMapping("friendrequests")
 	public List<FriendsListDTO> getAllRequestsOfAUser(HttpServletRequest request) throws UnauthorizedException {
-		Integer receiverId = SessionManager.getLoggedUser(request).getId();
+		Integer receiverId = SessionManager.getLoggedUser(request);
 
 		return userService.findAllUsersFromRequestsTo(receiverId).stream()
 				.map(user -> new FriendsListDTO(user.getFirstName(), user.getLastName(), user.getFriends().size()))
