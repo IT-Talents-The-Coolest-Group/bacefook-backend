@@ -28,7 +28,8 @@ import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
 import com.bacefook.utility.TimeConverter;
 
-@CrossOrigin
+//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class PostsController {
 

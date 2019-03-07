@@ -34,7 +34,8 @@ import com.bacefook.service.GenderService;
 import com.bacefook.service.UserService;
 import com.bacefook.utility.UserValidation;
 
-@CrossOrigin
+//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class UserController {
 
