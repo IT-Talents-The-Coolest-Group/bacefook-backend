@@ -3,8 +3,6 @@ package com.bacefook.controller;
 import java.io.IOException;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,11 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.ChangePasswordDTO;
-import com.bacefook.dto.HomePageDTO;
 import com.bacefook.dto.LoginDTO;
-import com.bacefook.dto.PostDTO;
 import com.bacefook.dto.SignUpDTO;
-import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
@@ -34,7 +29,8 @@ import com.bacefook.service.GenderService;
 import com.bacefook.service.UserService;
 import com.bacefook.utility.UserValidation;
 
-@CrossOrigin
+//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class UserController {
 
@@ -43,24 +39,13 @@ public class UserController {
 	@Autowired
 	private GenderService genderService;
 
+	private ModelMapper mapper = new ModelMapper();
+
 	@GetMapping("/")
-	public ResponseEntity<Object> startingPage(HttpServletResponse response) throws IOException {
-		response.sendRedirect("https://bacefookcommunity.postman.co/collections/6778985-5d93e005-f4f3-49fb-bc1d-956ce5e813fa?workspace=1bf0d2e0-4007-4e35-8219-38fec2a53b9d&fbclid=IwAR3xRCIhE9w4EKR-YEC2Hvt111icy21wEpQ5JgQgvjzVguz_OIfLa2i8fJs");
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
 
-	@GetMapping("/home")
-	public ResponseEntity<HomePageDTO> homePage(HttpServletRequest request) throws UnauthorizedException {
-		User loggedUser = SessionManager.getLoggedUser(request);
-
-		// TODO profile picture
-		// TODO create object
-		UserSummaryDTO user = new UserSummaryDTO();
-
-		List<PostDTO> allFriendsPosts = new ArrayList<>();
-		HomePageDTO home = new HomePageDTO(user, allFriendsPosts);
-
-		return new ResponseEntity<HomePageDTO>(home, HttpStatus.OK);
+	public void startingPage(HttpServletResponse response) throws IOException {
+		response.sendRedirect(
+				"https://bacefookcommunity.postman.co/collections/6778985-5d93e005-f4f3-49fb-bc1d-956ce5e813fa?workspace=1bf0d2e0-4007-4e35-8219-38fec2a53b9d&fbclid=IwAR3xRCIhE9w4EKR-YEC2Hvt111icy21wEpQ5JgQgvjzVguz_OIfLa2i8fJs");
 	}
 
 	@PostMapping("/users/changepassword")
@@ -69,10 +54,10 @@ public class UserController {
 			ElementNotFoundException {
 
 		UserValidation.validate(passDto);
-		User user = SessionManager.getLoggedUser(request);
-//			User user = userService.findUserById((Integer) user);
+		int userId = SessionManager.getLoggedUser(request);
+		User user = userService.findById(userId);
 		String oldPass = Cryptography.cryptSHA256(passDto.getOldPassword());
-		if (user.getPassword().matches(oldPass)) {
+		if (user.getPassword().equals(oldPass)) {
 			user.setPassword(Cryptography.cryptSHA256(passDto.getNewPassword()));
 			userService.save(user);
 			
@@ -83,7 +68,7 @@ public class UserController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<Integer> signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request,
+	public int signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request,
 			HttpServletResponse response) throws InvalidUserCredentialsException, ElementNotFoundException,
 			NoSuchAlgorithmException, UnauthorizedException, IOException {
 
@@ -97,29 +82,27 @@ public class UserController {
 		}
 
 		User user = new User();
-		new ModelMapper().map(signUp, user);
+		this.mapper.map(signUp, user);
 		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
 		user.setGenderId(genderService.findByName(signUp.getGender()).getId());
 
+		userService.save(user);
 		SessionManager.signInUser(request, user);
 
-		return new ResponseEntity<Integer>(userService.save(user), HttpStatus.OK);
-
+		return user.getId();
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Integer> login(@RequestBody LoginDTO login, HttpServletRequest request)
+	public int login(@RequestBody LoginDTO login, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException,
 			UnauthorizedException {
 		if (!SessionManager.isLogged(request)) {
 			UserValidation.validate(login);
 			User user = userService.findByEmail(login.getEmail());
 
-			if (user.getPassword().matches(Cryptography.cryptSHA256(login.getPassword()))) {
-//			response.setHeader("location", "https://google.bg");
-//			HttpHeaders headers = new HttpHeaders();
+			if (user.getPassword().equals(Cryptography.cryptSHA256(login.getPassword()))) {
 				SessionManager.signInUser(request, user);
-				return new ResponseEntity<>(user.getId(), HttpStatus.OK);
+				return user.getId();
 			} else {
 				throw new InvalidUserCredentialsException("Wrong login credentials!");
 			}
@@ -129,10 +112,10 @@ public class UserController {
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<String> logout(HttpServletRequest request) throws UnauthorizedException {
+	public String logout(HttpServletRequest request) throws UnauthorizedException {
 		if (SessionManager.isLogged(request)) {
 			String message = SessionManager.logOutUser(request);
-			return new ResponseEntity<>(message, HttpStatus.OK);
+			return message;
 		} else {
 			throw new UnauthorizedException("You are not logged in!");
 		}

@@ -49,7 +49,7 @@ public class RelationsController {
 	public ResponseEntity<Object> sendFriendRequest(@PathVariable Integer id, HttpServletRequest request)
 			throws RelationException, UnauthorizedException, ElementNotFoundException {
 
-		userService.sendFriendRequest(SessionManager.getLoggedUser(request).getId(), id);
+		userService.sendFriendRequest(SessionManager.getLoggedUser(request), id);
 		return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
 	}
 
@@ -57,7 +57,7 @@ public class RelationsController {
 	public ResponseEntity<List<UserSummaryDTO>> getAllFriendRequests(HttpServletRequest request) 
 			throws UnauthorizedException {
 		
-		Integer receiverId = SessionManager.getLoggedUser(request).getId();
+		Integer receiverId = SessionManager.getLoggedUser(request);
 		
 		return new ResponseEntity<List<UserSummaryDTO>>(
 				userService
@@ -76,7 +76,7 @@ public class RelationsController {
 	public ResponseEntity<Object> acceptFriendRequest(@PathVariable Integer senderId, HttpServletRequest request) 
 			throws UnauthorizedException {
 		
-		Integer receiverId = SessionManager.getLoggedUser(request).getId();
+		Integer receiverId = SessionManager.getLoggedUser(request);
 		userService.confirmFriendRequest(receiverId, senderId);
 		
 		return new ResponseEntity<>(HttpStatus.OK);

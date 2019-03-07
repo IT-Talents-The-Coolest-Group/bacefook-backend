@@ -45,7 +45,7 @@ public class CommentsController {
 	@PostMapping("/commentlikes")
 	public ResponseEntity<String> addLikeToComment(@RequestParam("commentId") Integer commentId,
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
-		int userId = SessionManager.getLoggedUser(request).getId();
+		int userId = SessionManager.getLoggedUser(request);
 		commentsService.findById(commentId);
 //		commentsService.likeCommentById(userId, commentId);
 		dao.addLikeToComment(commentId, userId);
@@ -56,7 +56,9 @@ public class CommentsController {
 	public ResponseEntity<CommentDTO> addReplyToComment(@RequestParam("commentId") Integer commentId,
 			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
-		User user = SessionManager.getLoggedUser(request);
+		
+		// TODO move to service layer
+		User user = userService.findById(SessionManager.getLoggedUser(request));
 		Comment comment = commentsService.findById(commentId);
 		Comment reply = new Comment(null, user.getId(), comment.getPostId(), commentId, commentContentDto.getContent(),
 				LocalDateTime.now());
@@ -73,7 +75,7 @@ public class CommentsController {
 		// TODO check if comment is a reply on another comment
 		// TODO validate if properties are not empty
 
-		int posterId = SessionManager.getLoggedUser(request).getId();
+		int posterId = SessionManager.getLoggedUser(request);
 		Comment comment = new Comment(posterId, postId, commentContentDto.getContent(), LocalDateTime.now());
 
 		// TODO validate with status code
