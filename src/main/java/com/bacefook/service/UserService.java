@@ -1,5 +1,6 @@
 package com.bacefook.service;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -7,14 +8,18 @@ import java.util.Optional;
 
 import javax.management.relation.RelationException;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bacefook.dto.SignUpDTO;
 import com.bacefook.exception.ElementNotFoundException;
+import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.model.Relation;
 import com.bacefook.model.User;
 import com.bacefook.repository.RelationsRepository;
 import com.bacefook.repository.UsersRepository;
+import com.bacefook.security.Cryptography;
 
 @Service
 public class UserService {
@@ -23,7 +28,11 @@ public class UserService {
 	private UsersRepository usersRepo;
 	@Autowired 
 	private RelationsRepository relationsRepo;
-
+	@Autowired
+	private GenderService genderService;
+	private ModelMapper mapper = new ModelMapper();
+	
+	
 	public User findByEmail(String email) throws ElementNotFoundException {
 		User user = usersRepo.findByEmail(email);
 		
@@ -98,6 +107,36 @@ public class UserService {
 			}
 		}
 		return matches;
+	}
+
+	
+	public void changePassword(int userId, String oldPassword, String newPassword) 
+			throws ElementNotFoundException, NoSuchAlgorithmException, InvalidUserCredentialsException {
+		
+		User user = findById(userId);
+		String oldPass = Cryptography.cryptSHA256(oldPassword);
+		
+		// TODO implement safer equals
+		if (user.getPassword().equals(oldPass)) {
+			user.setPassword(Cryptography.cryptSHA256(newPassword));
+			save(user);
+		} 
+		else {
+			throw new InvalidUserCredentialsException("Incorrect password!");
+		}
+	}
+
+	public User save(SignUpDTO signUp) 
+			throws NoSuchAlgorithmException, ElementNotFoundException {
+		
+		User user = new User();
+		this.mapper.map(signUp, user);
+		
+		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
+		user.setGenderId(genderService.findByName(signUp.getGender()).getId());
+
+		save(user);
+		return user;
 	}
 	
 }

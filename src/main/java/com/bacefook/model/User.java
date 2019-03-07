@@ -59,7 +59,6 @@ public class User {
     	inverseJoinColumns = { @JoinColumn(name = "receiver_id") })
 	@WhereJoinTable( 
 		clause = "is_confirmed = 1")
-
 	private Set<User> friends;
 
 	public String getFullName() {

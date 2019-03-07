@@ -20,11 +20,6 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
-//	@ExceptionHandler(NullPointerException.class)
-//	public ResponseEntity<Object> handleNullPointerError(NullPointerException e) {
-//		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
-
 	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
 	public ResponseEntity<Object> handleSQLIntegrityConstraintViolatingError(
 			SQLIntegrityConstraintViolationException e) {
@@ -55,4 +50,14 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Object> handleRelationError(RelationException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(UnprocessableFileException.class)
+	public ResponseEntity<Object> handleUnprocessableFileError(UnprocessableFileException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+	}
+	
+//	@ExceptionHandler(NullPointerException.class)
+//	public ResponseEntity<Object> handleNullPointerError(NullPointerException e) {
+//		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
 }

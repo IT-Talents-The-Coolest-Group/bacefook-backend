@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,11 +39,10 @@ public class PostsController {
 	private PostService postsService;
 	@Autowired
 	private UserService userService;
-
 	private ModelMapper mapper = new ModelMapper();
 
 	@GetMapping("/home")
-	public ResponseEntity<HomePageDTO> homePage(HttpServletRequest request)
+	public HomePageDTO homePage(HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
 		
 		Integer userId = SessionManager.getLoggedUser(request);
@@ -71,52 +68,50 @@ public class PostsController {
 
 		HomePageDTO home = new HomePageDTO(userMap, friendsPostsMap);
 
-		return new ResponseEntity<HomePageDTO>(home, HttpStatus.OK);
+		return home;
 	}
 
 	@PostMapping("/postlikes")
-	public ResponseEntity<Object> likeAPost(@RequestParam("postId") Integer postId, HttpServletRequest request)
+	public void likeAPost(@RequestParam("postId") Integer postId, HttpServletRequest request)
 			throws UnauthorizedException {
 		int userId = SessionManager.getLoggedUser(request);
 		postsService.likePost(userId, postId);
-		
-		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@GetMapping("/postlikes")
-	public ResponseEntity<List<UserSummaryDTO>> getAllUsersWhoLikedPost(@RequestParam("postId") Integer postId) {
+	public List<UserSummaryDTO> getAllUsersWhoLikedPost(@RequestParam("postId") Integer postId) {
 		List<User> users = postsService.findAllUsersWhoLikedAPost(postId);
 		List<UserSummaryDTO> returnUsers = new ArrayList<UserSummaryDTO>();
 		for (User user : users) {
 			UserSummaryDTO dto = new UserSummaryDTO(user.getFirstName(), user.getLastName());
 			returnUsers.add(dto);
 		}
-		return new ResponseEntity<List<UserSummaryDTO>>(returnUsers, HttpStatus.OK);
+		return returnUsers;
 	}
 
 	@GetMapping("/postlikes-size")
-	public ResponseEntity<Integer> getLikesCountOnPost(@RequestParam("postId") Integer postId) {
+	public Integer getLikesCountOnPost(@RequestParam("postId") Integer postId) {
 		List<User> likers = postsService.findAllUsersWhoLikedAPost(postId);
-		return new ResponseEntity<Integer>(likers.size(), HttpStatus.OK);
+		return likers.size();
 	}
 
 	@PostMapping("/posts")
-	public ResponseEntity<Object> createPost(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
+	public Integer createPost(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
 			throws UnauthorizedException { // Exceptions
 		int posterId = SessionManager.getLoggedUser(request);
 		// TODO validate if properties are not empty
 
 		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
 		postsService.save(post);
-		return new ResponseEntity<>(post.getId(), HttpStatus.OK);
+		return post.getId();
 	}
 
 	@GetMapping("/posts")
-	public ResponseEntity<List<PostDTO>> getAllPostsOfUser(@RequestParam("posterId") int posterId,
+	public List<PostDTO> getAllPostsOfUser(@RequestParam("posterId") int posterId,
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
 
 		// TODO check if user is friend with poster
-//		SessionManager.getLoggedUser(request);
+		// SessionManager.getLoggedUser(request);
 
 		List<Post> posts = postsService.findAllByUserId(posterId);
 		List<PostDTO> returnedPosts = new ArrayList<>();
@@ -131,12 +126,12 @@ public class PostsController {
 
 			returnedPosts.add(postDto);
 		}
-		return new ResponseEntity<>(returnedPosts, HttpStatus.OK);
+		return returnedPosts;
 
 	}
 
 	@PutMapping("/posts")
-	public ResponseEntity<String> updateStatus(@RequestParam("postId") Integer postId, @RequestBody PostContentDTO content,
+	public void updateStatus(@RequestParam("postId") Integer postId, @RequestBody PostContentDTO content,
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
 		
 		if (!SessionManager.isLogged(request)) {
@@ -151,8 +146,6 @@ public class PostsController {
 		Post post = postsService.findById(postId);
 		post.setContent(content.getContent());
 		postsService.save(post);
-		
-		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }

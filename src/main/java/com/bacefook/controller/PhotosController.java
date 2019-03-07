@@ -4,15 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bacefook.dto.PhotoDTO;
+import com.bacefook.exception.UnauthorizedException;
+import com.bacefook.exception.UnprocessableFileException;
 import com.bacefook.service.PhotoHostingService;
 
 @RestController
@@ -21,18 +24,21 @@ public class PhotosController {
 	@Autowired
 	private PhotoHostingService photoService;
 
-	@PostMapping("{postId}/attachphoto")
-	public ResponseEntity<String> uploadPhoto(@PathVariable Integer postId, @RequestParam MultipartFile input) {
+	@PostMapping("uploadphoto")
+	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request, @RequestBody String postContent)
+		throws UnprocessableFileException, UnauthorizedException {
 
+		Integer userId = SessionManager.getLoggedUser(request);
+		
 		try {
+			// TODO fix file name (remove extension and "temp")
 			File file = Files.createTempFile("temp", input.getOriginalFilename()).toFile();
 			input.transferTo(file);
 
-			String imageUrl = photoService.save(postId, file);
-			return new ResponseEntity<String>((String) imageUrl, HttpStatus.OK);
+			return photoService.save(file, userId, postContent);
 		} 
 		catch (IOException e) {
-			return new ResponseEntity<String>("Could not your process image, sorry!", HttpStatus.BAD_REQUEST);
+			throw new UnprocessableFileException("Could not your process image, sorry!");
 		}
 	}
 	
