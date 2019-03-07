@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class PhotosController {
 	private PhotoHostingService photoService;
 
 	@PostMapping("uploadphoto")
-	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request, @RequestBody String postContent)
+	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request,HttpServletResponse response, @RequestParam String postContent)
 		throws UnprocessableFileException, UnauthorizedException {
 
 		Integer userId = SessionManager.getLoggedUser(request);
@@ -34,10 +35,10 @@ public class PhotosController {
 			// TODO fix file name (remove extension and "temp")
 			File file = Files.createTempFile("temp", input.getOriginalFilename()).toFile();
 			input.transferTo(file);
-
-			return photoService.save(file, userId, postContent);
-		} 
-		catch (IOException e) {
+			PhotoDTO photoDto = photoService.save(file, userId, postContent);
+			response.sendRedirect("https://res.cloudinary.com/bacefook/image/upload/v1551888321/8603_baaaaby.jpg.jpg");
+			return photoDto;
+		}catch (IOException e) {
 			throw new UnprocessableFileException("Could not your process image, sorry!");
 		}
 	}
