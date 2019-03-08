@@ -17,7 +17,10 @@ import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.model.Relation;
 import com.bacefook.model.User;
+import com.bacefook.model.UserInfo;
+import com.bacefook.repository.GenderRepository;
 import com.bacefook.repository.RelationsRepository;
+import com.bacefook.repository.UsersInfoRepository;
 import com.bacefook.repository.UsersRepository;
 import com.bacefook.security.Cryptography;
 
@@ -29,7 +32,9 @@ public class UserService {
 	@Autowired 
 	private RelationsRepository relationsRepo;
 	@Autowired
-	private GenderService genderService;
+	private GenderRepository genderService;
+	@Autowired
+	private UsersInfoRepository usersInfoRepo;
 	private ModelMapper mapper = new ModelMapper();
 	
 	
@@ -109,7 +114,6 @@ public class UserService {
 		return matches;
 	}
 
-	
 	public void changePassword(int userId, String oldPassword, String newPassword) 
 			throws ElementNotFoundException, NoSuchAlgorithmException, InvalidUserCredentialsException {
 		
@@ -133,10 +137,18 @@ public class UserService {
 		this.mapper.map(signUp, user);
 		
 		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
-		user.setGenderId(genderService.findByName(signUp.getGender()).getId());
+		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
 
 		save(user);
 		return user;
+	}
+	
+	public List<UserInfo> findAllUsersInfo() {
+		return usersInfoRepo.findAll();
+	}
+	
+	public void save(UserInfo info) {
+		usersInfoRepo.save(info);
 	}
 	
 }

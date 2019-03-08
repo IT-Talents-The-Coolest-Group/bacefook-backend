@@ -50,8 +50,8 @@ public class PostService {
 		return postsRepo.findAllByPosterId(posterId);
 	}
 	
-	public void save(Post post) {
-		postsRepo.save(post);
+	public Post save(Post post) {
+		return postsRepo.save(post);
 	}
 	
 	public Post findById(Integer postId) throws ElementNotFoundException {
