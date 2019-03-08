@@ -1,6 +1,7 @@
 package com.bacefook.service;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -12,7 +13,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bacefook.dao.UserDAO;
 import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.model.Relation;
@@ -35,6 +38,9 @@ public class UserService {
 	private GenderRepository genderService;
 	@Autowired
 	private UsersInfoRepository usersInfoRepo;
+	
+	@Autowired
+	private UserDAO userDao;
 	private ModelMapper mapper = new ModelMapper();
 	
 	
@@ -102,16 +108,18 @@ public class UserService {
 		return users;
 	}
 	
-	public List<User> searchByName(String input) {
-		List<User> users = usersRepo.findAll();
-		List<User> matches = new LinkedList<User>();
-		
+	public List<UserSummaryDTO> searchByNameOrderedAndLimited(String search,Integer userId) {
+		List<Integer> ids = userDao.getAllSearchingMatchesOrderedByIfFriend(userId, search);
+		System.out.println(ids);
+		List<User> users = usersRepo.findAllById(ids);
+		System.out.println(users);
+		List<UserSummaryDTO> usersDTO = new ArrayList<UserSummaryDTO>(users.size());
 		for (User user : users) {
-			if (user.getFullName().contains(input)) {
-				matches.add(user);
-			}
+			UserSummaryDTO dto = new UserSummaryDTO();
+			this.mapper.map(user, dto);//TODO check if sets friends count and profile photo
+			usersDTO.add(dto);
 		}
-		return matches;
+		return usersDTO;
 	}
 
 	public void changePassword(int userId, String oldPassword, String newPassword) 
