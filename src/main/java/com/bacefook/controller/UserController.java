@@ -43,9 +43,11 @@ public class UserController {
 	}
 
 	@GetMapping("/users/search")
-	public List<UserSummaryDTO> getAllUsersBySearch(@RequestParam String input) {
-		// TODO
-		return null;
+	public List<UserSummaryDTO> getAllUsersBySearch(@RequestParam String input,HttpServletRequest request) throws UnauthorizedException {
+		Integer userId = SessionManager.getLoggedUser(request);
+		List<UserSummaryDTO> users = userService.searchByNameOrderedAndLimited(input, userId);
+		System.out.println(users);
+		return users;
 	}
 
 	@PostMapping("/users/changepassword")

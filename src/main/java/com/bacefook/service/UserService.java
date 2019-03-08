@@ -1,6 +1,7 @@
 package com.bacefook.service;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -116,16 +117,18 @@ public class UserService {
 		return users;
 	}
 	
-	public List<User> searchByName(String input) {
-		List<User> users = usersRepo.findAll();
-		List<User> matches = new LinkedList<User>();
-		
+	public List<UserSummaryDTO> searchByNameOrderedAndLimited(String search,Integer userId) {
+		List<Integer> ids = userDAO.getAllSearchingMatchesOrderedByIfFriend(userId, search);
+		System.out.println(ids);
+		List<User> users = usersRepo.findAllById(ids);
+		System.out.println(users);
+		List<UserSummaryDTO> usersDTO = new ArrayList<UserSummaryDTO>(users.size());
 		for (User user : users) {
-			if (user.getFullName().contains(input)) {
-				matches.add(user);
-			}
+			UserSummaryDTO dto = new UserSummaryDTO();
+			this.mapper.map(user, dto);//TODO check if sets friends count and profile photo
+			usersDTO.add(dto);
 		}
-		return matches;
+		return usersDTO;
 	}
 
 	public void changePassword(int userId, String oldPassword, String newPassword) 
