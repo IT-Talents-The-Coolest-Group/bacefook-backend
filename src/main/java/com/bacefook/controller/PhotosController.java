@@ -33,7 +33,6 @@ public class PhotosController {
 					throws UnprocessableFileException, UnauthorizedException {
 
 		Integer userId = SessionManager.getLoggedUser(request);
-
 		PhotoDTO photoDto = photoService.save(input, userId);
 		
 		try {
