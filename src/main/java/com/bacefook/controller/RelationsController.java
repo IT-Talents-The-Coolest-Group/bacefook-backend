@@ -36,7 +36,7 @@ public class RelationsController {
 				.getFriends()
 				.stream()
 				.map(user -> {
-					UserSummaryDTO userDTO = null;
+					UserSummaryDTO userDTO = new UserSummaryDTO();
 					new ModelMapper().map(user, userDTO);
 					return userDTO;
 				})
@@ -62,7 +62,7 @@ public class RelationsController {
 				.findAllFromRequestsTo(receiverId)
 				.stream()
 				.map(user -> {
-					UserSummaryDTO friendDTO = null;
+					UserSummaryDTO friendDTO = new UserSummaryDTO();
 					new ModelMapper().map(user, friendDTO); 
 					return friendDTO;
 				})

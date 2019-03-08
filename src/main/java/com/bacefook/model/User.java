@@ -60,8 +60,12 @@ public class User {
 	@WhereJoinTable( 
 		clause = "is_confirmed = 1")
 	private Set<User> friends;
-
+	
 	public String getFullName() {
 		return getFirstName() + " " + getLastName();
+	}
+	
+	public Integer getFriendsCount() {
+		return friends.size();
 	}
 }
