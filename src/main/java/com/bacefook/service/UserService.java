@@ -12,7 +12,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bacefook.dao.UserDAO;
 import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.model.Relation;
@@ -35,6 +37,8 @@ public class UserService {
 	private GenderRepository genderService;
 	@Autowired
 	private UsersInfoRepository usersInfoRepo;
+	@Autowired
+	private UserDAO userDAO;
 	private ModelMapper mapper = new ModelMapper();
 	
 	
@@ -70,35 +74,45 @@ public class UserService {
 		
 		Relation friendRequest = new Relation(senderId, receiverId, 0);
 		
+		if (senderId.equals(receiverId)) {
+			throw new RelationException("You cannot send a request to yourself!");
+		}
+		
 		if (!usersRepo.existsById(senderId) || !usersRepo.existsById(receiverId)) {
 			throw new ElementNotFoundException("A user with that ID does not exist!");
 		}
 		
-		if (relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId) == null) {
-			relationsRepo.save(friendRequest);
-		}
-		else {
+		if (relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId) != null) {
 			throw new RelationException("You have already sent a request to that person!"); 
 		}
+		
+		relationsRepo.save(friendRequest);
 	}
 
-	public void confirmFriendRequest(Integer receiverId, Integer senderId) {
+	public void confirmFriendRequest(Integer receiverId, Integer senderId) throws RelationException {
 		Relation relation = relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId);
+		if (relation == null) {
+			throw new RelationException("You do not have a request from that user!");
+		}
 		relation.setIsConfirmed(1);
 		relationsRepo.save(relation);
 	}
 	
-	public List<User> findAllFromRequestsTo(Integer receiverId) {
-		List<Relation> relations = relationsRepo.findAllByReceiverId(receiverId);
+	public List<UserSummaryDTO> findAllFromRequestsTo(Integer userId) {
+		List<Integer> userIds = userDAO.findAllRequestsTo(userId);
 				
-		List<User> users = new LinkedList<User>();
+		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();
 		
-		for (Relation relation : relations) {
-			Optional<User> optionalUser = usersRepo.findById(relation.getSenderId());
-			if (optionalUser.isPresent()) {
-				users.add(optionalUser.get());
+		for (Integer id : userIds) {
+			Optional<User> user = usersRepo.findById(id);
+			
+			if (user.isPresent()) {
+				UserSummaryDTO summary = new UserSummaryDTO();
+				mapper.map(user.get(), summary);
+				users.add(summary);
 			}
 		}
+		
 		return users;
 	}
 	

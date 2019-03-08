@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class UserSummaryDTO {
 	
+	private Integer id;
 	@NonNull 
 	private String firstName;
 	@NonNull 

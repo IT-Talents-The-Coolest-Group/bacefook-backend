@@ -28,7 +28,6 @@ import com.bacefook.model.User;
 import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
 
-//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class PostsController {
@@ -40,13 +39,16 @@ public class PostsController {
 	private ModelMapper mapper = new ModelMapper();
 
 	@GetMapping("/home")
-	public HomePageDTO homePage(HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+	public HomePageDTO homePage(HttpServletRequest request) 
+			throws UnauthorizedException, ElementNotFoundException {
 
 		Integer userId = SessionManager.getLoggedUser(request);
 		User loggedUser = userService.findById(userId);
-		UserSummaryDTO user = new UserSummaryDTO(loggedUser.getFirstName(), loggedUser.getLastName());// TODO profile
-																										// picture,cover
-																										// photo
+		
+		UserSummaryDTO user = new UserSummaryDTO();
+		mapper.map(loggedUser, user);
+		// TODO profile, picture, cover, photo
+																										
 		HashMap<String, UserSummaryDTO> userMap = new HashMap<>();
 
 		userMap.put("loggedUser", user);
@@ -99,7 +101,7 @@ public class PostsController {
 
 	@PostMapping("/posts")
 	public Integer createPost(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
-			throws UnauthorizedException { // Exceptions
+			throws UnauthorizedException {
 		int posterId = SessionManager.getLoggedUser(request);
 		// TODO validate if properties are not empty
 

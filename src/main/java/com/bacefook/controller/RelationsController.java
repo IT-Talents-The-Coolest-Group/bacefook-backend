@@ -31,6 +31,8 @@ public class RelationsController {
 	public Set<UserSummaryDTO> getFriendsOfUser(@PathVariable Integer id)
 			throws ElementNotFoundException {
 		
+		// TODO move to service
+		
 		return 	userService.
 				findById(id)
 				.getFriends()
@@ -48,8 +50,7 @@ public class RelationsController {
 			throws RelationException, UnauthorizedException, ElementNotFoundException {
 
 		userService.sendFriendRequest(SessionManager.getLoggedUser(request), id);
-		// TODO
-		return "Friend request was send to "+id;//TODO get name by user id
+		return "Friend request was send to " + id; //TODO get name by user id
 	}
 
 	@GetMapping("friendrequests")
@@ -57,25 +58,15 @@ public class RelationsController {
 			throws UnauthorizedException {
 		
 		Integer receiverId = SessionManager.getLoggedUser(request);
-		
-		return userService
-				.findAllFromRequestsTo(receiverId)
-				.stream()
-				.map(user -> {
-					UserSummaryDTO friendDTO = new UserSummaryDTO();
-					new ModelMapper().map(user, friendDTO); 
-					return friendDTO;
-				})
-				.collect(Collectors.toList());
+		return userService.findAllFromRequestsTo(receiverId);
 	}
 
-	// TODO add to postman
 	@PutMapping("{senderId}/acceptrequest")
 	public String acceptFriendRequest(@PathVariable Integer senderId, HttpServletRequest request) 
-			throws UnauthorizedException {
+			throws UnauthorizedException, RelationException {
 		//TODO validate if there is friend request, if you are not already friends
 		Integer receiverId = SessionManager.getLoggedUser(request);
 		userService.confirmFriendRequest(receiverId, senderId);
-		return "You are now friends with "+senderId;//TODO get name by id
+		return "You are now friends with "+ senderId; //TODO get name by id
 	}
 }
