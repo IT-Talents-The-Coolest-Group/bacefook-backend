@@ -25,7 +25,7 @@ public class PhotosController {
 	@Autowired
 	private PhotoHostingService photoService;
 
-	@PostMapping("uploadphoto")
+	@PostMapping("/uploadphoto")
 	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request,HttpServletResponse response, @RequestParam String postContent)
 		throws UnprocessableFileException, UnauthorizedException {
 
@@ -36,7 +36,7 @@ public class PhotosController {
 			File file = Files.createTempFile("temp", input.getOriginalFilename()).toFile();
 			input.transferTo(file);
 			PhotoDTO photoDto = photoService.save(file, userId, postContent);
-			response.sendRedirect("https://res.cloudinary.com/bacefook/image/upload/v1551888321/8603_baaaaby.jpg.jpg");
+//			response.sendRedirect("https://res.cloudinary.com/bacefook/image/upload/v1551888321/8603_baaaaby.jpg.jpg");
 			return photoDto;
 		}catch (IOException e) {
 			throw new UnprocessableFileException("Could not your process image, sorry!");
