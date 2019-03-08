@@ -12,4 +12,6 @@ public class HomePageDTO {
 	private HashMap<String, UserSummaryDTO> loggedUser;
 	@NonNull
 	private HashMap<String, List<PostDTO>> allPosts;
+	@NonNull
+	private HashMap<String, Integer> friendRequestsCount;
 }
