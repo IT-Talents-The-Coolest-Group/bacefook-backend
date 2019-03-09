@@ -21,6 +21,7 @@ import com.bacefook.dto.HomePageDTO;
 import com.bacefook.dto.NavigationBarDTO;
 import com.bacefook.dto.PostContentDTO;
 import com.bacefook.dto.PostDTO;
+import com.bacefook.dto.ProfilePageDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
