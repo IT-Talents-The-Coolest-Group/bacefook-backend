@@ -120,5 +120,9 @@ public class PhotoService {
 		
 		return photos;
 	}
+	public boolean getIfUserHasPhotoById(Integer userId,Integer photoId) {
+		List<Integer> photoIds = photosRepo.findAllPhotosOfUser(userId);
+		return photoIds.contains(photoId);
+	}
 	
 }

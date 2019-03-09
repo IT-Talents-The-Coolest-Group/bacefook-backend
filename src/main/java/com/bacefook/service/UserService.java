@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bacefook.dao.ProfilePhotoDAO;
+import com.bacefook.dao.RelationsDAO;
 import com.bacefook.dao.UserDAO;
 import com.bacefook.dto.SignUpDTO;
 import com.bacefook.dto.UserSummaryDTO;
@@ -40,10 +41,39 @@ public class UserService {
 	@Autowired
 	private UsersInfoRepository usersInfoRepo;
 	@Autowired
+	private PhotoService photoService;
+	@Autowired
 	private UserDAO userDAO;
+	@Autowired
+	private RelationsDAO relationsDAO;
 	@Autowired
 	private ProfilePhotoDAO profilePhotoDAO;
 	private ModelMapper mapper = new ModelMapper();
+	
+	public String removeFromFriends(Integer loggedId,Integer friendId) {
+		int rows = relationsDAO.removeFromFriends(loggedId, friendId);
+		if(rows>0) {
+			return "You are no longer friends with "+friendId;
+		}else {
+			return "Sorry, but you are not friends with such person.";
+		}
+	}
+	public String cancelFriendRequest(Integer loggedId,Integer receiverId) {
+		int rows = relationsDAO.cancelFriendRequest(loggedId, receiverId);
+		if(rows>0) {
+			return "You canceled a friend request for "+receiverId;
+		}else {
+			return "Sorry, but you have not sent friend request for this user.";
+		}
+	}
+	public String deleteFriendRequest(Integer loggedId,Integer senderId) {
+		int rows = relationsDAO.cancelFriendRequest(loggedId, senderId);
+		if(rows>0) {
+			return "You deleted a friend request from "+senderId;
+		}else {
+			return "Sorry, but you have not received friend request from this user.";
+		}
+	}
 	
 	public String findProfilePhotoUrl(Integer userId) throws ElementNotFoundException {
 		List<String> url = profilePhotoDAO.findProfilePhotoUrl(userId);
@@ -210,8 +240,10 @@ public class UserService {
 		
 		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
 		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
-
-		save(user);
+		int id = save(user);
+		UserInfo info = new UserInfo();
+		info.setId(id);
+		save(info);
 		return user;
 	}
 	
@@ -219,8 +251,18 @@ public class UserService {
 		return usersInfoRepo.findAll();
 	}
 	
-	public void save(UserInfo info) {
-		usersInfoRepo.save(info);
+	public Integer save(UserInfo info) throws ElementNotFoundException {
+		Optional<User> user = usersRepo.findById(info.getId());
+		if(!user.isPresent()) {
+			throw new ElementNotFoundException("No such user! Register before you can setup your profile.");
+		}
+		if(info.getProfilePhotoId()!=null && !photoService.getIfUserHasPhotoById(info.getId(), info.getProfilePhotoId())) {
+			throw new ElementNotFoundException("You are not the owner of this photo!");
+		}
+		if(info.getCoverPhotoId()!=null && !photoService.getIfUserHasPhotoById(info.getId(), info.getCoverPhotoId())) {
+			throw new ElementNotFoundException("You are not the owner of this photo!");
+		}
+		return usersInfoRepo.save(info).getId();
 	}
 	
 }
