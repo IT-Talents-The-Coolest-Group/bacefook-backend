@@ -87,7 +87,6 @@ public class PostService {
 	public List<Post> findAllWhichSharePostId(Integer postId) {
 		return postsRepo.findAllBySharesPostId(postId);
 	}
-
 	
 	public boolean existsById(Integer sharesPostId) {
 		return postsRepo.existsById(sharesPostId);
