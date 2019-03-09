@@ -110,6 +110,7 @@ public class UserService {
 			if (user.isPresent()) {
 				UserSummaryDTO summary = new UserSummaryDTO();
 				mapper.map(user.get(), summary);
+				summary.setFriendsCount(userDAO.findAllFriendsOf(id).size());
 				users.add(summary);
 			}
 		}
@@ -138,7 +139,13 @@ public class UserService {
 	public List<UserSummaryDTO> searchByNameOrderedAndLimited(String search,Integer userId) {
 		List<Integer> ids = userDAO.getAllSearchingMatchesOrderedByIfFriend(userId, search);
 		System.out.println(ids);
-		List<User> users = usersRepo.findAllById(ids);
+		List<User> users = new LinkedList<>();
+		for (Integer integer : ids) {
+			Optional<User> user = usersRepo.findById(integer);
+			if(user.isPresent()) {
+			users.add(user.get());
+			}
+		}
 		System.out.println(users);
 		List<UserSummaryDTO> usersDTO = new ArrayList<UserSummaryDTO>(users.size());
 		for (User user : users) {
