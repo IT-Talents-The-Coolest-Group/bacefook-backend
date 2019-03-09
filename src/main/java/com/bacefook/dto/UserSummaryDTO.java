@@ -20,6 +20,6 @@ public class UserSummaryDTO {
 	private String lastName;
 	
 	private Integer friendsCount;	
-	private String profilePhotoUrl;
+//	private String profilePhotoUrl;
 
 }
