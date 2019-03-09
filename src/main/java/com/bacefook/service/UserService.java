@@ -116,6 +116,24 @@ public class UserService {
 		
 		return users;
 	}
+	public List<UserSummaryDTO> findAllFriendOf(Integer userId){
+		List<Integer> friendsIds = userDAO.findAllFriendsOf(userId);
+		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();//TODO remove number of friends to user summary dto
+		for (Integer id : friendsIds) {
+			Optional<User> user = usersRepo.findById(id);
+			
+			if (user.isPresent()) {
+				UserSummaryDTO summary = new UserSummaryDTO();
+				mapper.map(user.get(), summary);
+				users.add(summary);
+			}
+		}
+		
+		return users;
+	}
+	public int getFriendsCountOF(Integer userId) {
+		return userDAO.findAllFriendsOf(userId).size();
+	}
 	
 	public List<UserSummaryDTO> searchByNameOrderedAndLimited(String search,Integer userId) {
 		List<Integer> ids = userDAO.getAllSearchingMatchesOrderedByIfFriend(userId, search);

@@ -30,7 +30,7 @@ public class PostService {
 	@Autowired
 	private PostDAO postDao;
 
-	public List<Post> findAllPostsFromFriends(Integer loggerId) {
+	public List<Post> findAllPostsFromFriends(Integer loggerId) {//TODO should we return postDTO
 		List<Integer> postIds = postDao.getAllPostsIdByFriends(loggerId);
 		List<Post> posts = new ArrayList<>();
 		for (Integer id : postIds) {

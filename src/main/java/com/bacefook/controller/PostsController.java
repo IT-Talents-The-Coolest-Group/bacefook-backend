@@ -2,7 +2,6 @@ package com.bacefook.controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,18 +43,17 @@ public class PostsController {
 
 		Integer userId = SessionManager.getLoggedUser(request);
 		User loggedUser = userService.findById(userId);
+		//TODO why is friends collection in User
 		
 		UserSummaryDTO user = new UserSummaryDTO();
 		mapper.map(loggedUser, user);
-		// TODO profile, picture, cover, photo
-																										
-		HashMap<String, UserSummaryDTO> userMap = new HashMap<>();
+		user.setFriendsCount(userService.getFriendsCountOF(userId));
 
-		userMap.put("loggedUser", user);
-		
+		//TODO remove friends count from UserSummaryDTO, property is for /profile, no point setting it for the home page
+		// TODO profile picture
+		//TODO Steven! cover photo is for /profile																									
 		List<Post> posts = postsService.findAllPostsFromFriends(userId);
 		List<PostDTO> allFriendsPosts = new ArrayList<PostDTO>(posts.size());
-
 		for (Post post : posts) {
 			PostDTO postDTO = new PostDTO();
 			this.mapper.map(post, postDTO);
@@ -64,13 +62,9 @@ public class PostsController {
 			allFriendsPosts.add(postDTO);
 		}
 
-		HashMap<String, List<PostDTO>> friendsPostsMap = new HashMap<>();
-		friendsPostsMap.put("friendsPosts", allFriendsPosts);
 		int friendsRequests = userService.findAllFromRequestsTo(userId).size();
-		HashMap<String, Integer> requestsMap = new HashMap<>();
-		requestsMap.put("friendRequestsCount", friendsRequests);
 
-		HomePageDTO home = new HomePageDTO(userMap, friendsPostsMap,requestsMap);
+		HomePageDTO home = new HomePageDTO(user, allFriendsPosts,friendsRequests);
 
 		return home;
 	}
