@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,6 @@ public class CommentService {
 	
 	@Autowired
 	private CommentsRepository commentsRepo;
-	private ModelMapper mapper = new ModelMapper();
 
 	public Comment save(Comment comment) {
 		return commentsRepo.save(comment);

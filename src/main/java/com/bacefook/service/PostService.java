@@ -45,11 +45,11 @@ public class PostService {
 	}
 
 	public List<Post> findAllByUser(User poster) {
-		return postsRepo.findAllByPosterId(poster.getId());
+		return postsRepo.findAllByPosterIdOrderByPostingTimeDesc(poster.getId());
 	}
 	
 	public List<Post> findAllByUserId(Integer posterId){
-		return postsRepo.findAllByPosterId(posterId);
+		return postsRepo.findAllByPosterIdOrderByPostingTimeDesc(posterId);
 	}
 	
 	public Post save(Post post) {
@@ -87,7 +87,6 @@ public class PostService {
 	public List<Post> findAllWhichSharePostId(Integer postId) {
 		return postsRepo.findAllBySharesPostId(postId);
 	}
-
 	
 	public boolean existsById(Integer sharesPostId) {
 		return postsRepo.existsById(sharesPostId);

@@ -21,7 +21,6 @@ import com.bacefook.dto.HomePageDTO;
 import com.bacefook.dto.NavigationBarDTO;
 import com.bacefook.dto.PostContentDTO;
 import com.bacefook.dto.PostDTO;
-import com.bacefook.dto.ProfilePageDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
@@ -102,10 +101,11 @@ public class PostsController {
 	}
 
 	@PostMapping("/posts")
-	public Integer createPost(@RequestBody String content, HttpServletRequest request)
+	public Integer createPost(@RequestBody PostContentDTO contentDto, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
 	
 		int posterId = SessionManager.getLoggedUser(request);
+		String content = contentDto.getContent();
 		
 		if (content == null || content.isEmpty()) {
 			throw new ElementNotFoundException("Write something before posting!");

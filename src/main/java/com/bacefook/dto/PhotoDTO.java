@@ -1,7 +1,5 @@
 package com.bacefook.dto;
 
-import com.bacefook.model.Post;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
