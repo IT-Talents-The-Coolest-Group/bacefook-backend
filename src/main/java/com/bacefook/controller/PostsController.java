@@ -43,7 +43,6 @@ public class PostsController {
 
 		Integer userId = SessionManager.getLoggedUser(request);
 		User loggedUser = userService.findById(userId);
-		//TODO why is friends collection in User
 		
 		UserSummaryDTO user = new UserSummaryDTO();
 		mapper.map(loggedUser, user);
@@ -51,7 +50,6 @@ public class PostsController {
 
 		//TODO remove friends count from UserSummaryDTO, property is for /profile, no point setting it for the home page
 		// TODO profile picture
-		//TODO Steven! cover photo is for /profile																									
 		List<Post> posts = postsService.findAllPostsFromFriends(userId);
 		List<PostDTO> allFriendsPosts = new ArrayList<PostDTO>(posts.size());
 		for (Post post : posts) {
@@ -82,6 +80,7 @@ public class PostsController {
 		List<UserSummaryDTO> returnUsers = new ArrayList<UserSummaryDTO>();
 		for (User user : users) {
 			UserSummaryDTO dto = new UserSummaryDTO(user.getFirstName(), user.getLastName());
+			dto.setFriendsCount(userService.getFriendsCountOF(user.getId()));
 			returnUsers.add(dto);
 		}
 		return returnUsers;
@@ -94,23 +93,29 @@ public class PostsController {
 	}
 
 	@PostMapping("/posts")
-	public Integer createPost(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
-			throws UnauthorizedException {
+	public Integer createPost(@RequestBody String content, HttpServletRequest request)
+			throws UnauthorizedException, ElementNotFoundException {
+	
 		int posterId = SessionManager.getLoggedUser(request);
-		// TODO validate if properties are not empty
-
-		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
+		//String content = postContentDto.getContent();
+		
+		if (content == null || content.isEmpty()) {
+			throw new ElementNotFoundException("Write something before posting!");
+		}
+		
+		Post post = new Post(posterId, content, LocalDateTime.now());
 		postsService.save(post);
 		return post.getId();
 	}
 
 	@PostMapping("/postshares")
 	public Integer sharePost(@RequestParam("sharesPostId") Integer sharesPostId,
-			@RequestBody PostContentDTO postContentDto, HttpServletRequest request) throws UnauthorizedException {
+			@RequestBody PostContentDTO postContentDto, HttpServletRequest request) 
+					throws UnauthorizedException, ElementNotFoundException {
+		
 		int posterId = SessionManager.getLoggedUser(request);
-		Post post = new Post(null, posterId, sharesPostId, postContentDto.getContent(), LocalDateTime.now());
-		postsService.save(post);
-		return post.getId();
+		
+		return postsService.save(sharesPostId, posterId, postContentDto);
 	}
 
 	@GetMapping("/postshares")

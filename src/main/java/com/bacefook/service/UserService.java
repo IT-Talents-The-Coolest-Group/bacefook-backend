@@ -110,27 +110,31 @@ public class UserService {
 			if (user.isPresent()) {
 				UserSummaryDTO summary = new UserSummaryDTO();
 				mapper.map(user.get(), summary);
+				summary.setFriendsCount(getFriendsCountOF(user.get().getId()));
 				users.add(summary);
 			}
 		}
 		
 		return users;
 	}
+	
 	public List<UserSummaryDTO> findAllFriendOf(Integer userId){
 		List<Integer> friendsIds = userDAO.findAllFriendsOf(userId);
-		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();//TODO remove number of friends to user summary dto
+		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();
 		for (Integer id : friendsIds) {
 			Optional<User> user = usersRepo.findById(id);
 			
 			if (user.isPresent()) {
 				UserSummaryDTO summary = new UserSummaryDTO();
 				mapper.map(user.get(), summary);
+				summary.setFriendsCount(getFriendsCountOF(user.get().getId()));
 				users.add(summary);
 			}
 		}
 		
 		return users;
 	}
+	
 	public int getFriendsCountOF(Integer userId) {
 		return userDAO.findAllFriendsOf(userId).size();
 	}
@@ -141,9 +145,11 @@ public class UserService {
 		List<User> users = usersRepo.findAllById(ids);
 		System.out.println(users);
 		List<UserSummaryDTO> usersDTO = new ArrayList<UserSummaryDTO>(users.size());
+		
 		for (User user : users) {
 			UserSummaryDTO dto = new UserSummaryDTO();
-			this.mapper.map(user, dto);//TODO check if sets friends count and profile photo
+			this.mapper.map(user, dto);
+			dto.setFriendsCount(getFriendsCountOF(user.getId()));
 			usersDTO.add(dto);
 		}
 		return usersDTO;

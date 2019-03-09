@@ -1,5 +1,6 @@
 package com.bacefook.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bacefook.dao.PostDAO;
+import com.bacefook.dto.PostContentDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.model.Post;
 import com.bacefook.model.PostLike;
@@ -84,6 +86,24 @@ public class PostService {
 	
 	public List<Post> findAllWhichSharePostId(Integer postId) {
 		return postsRepo.findAllBySharesPostId(postId);
+	}
+
+	
+	public boolean existsById(Integer sharesPostId) {
+		return postsRepo.existsById(sharesPostId);
+	}
+
+	public Integer save(Integer sharesPostId, int posterId, PostContentDTO postContentDto) 
+			throws ElementNotFoundException {
+		
+		if (!existsById(sharesPostId)) {
+			throw new ElementNotFoundException("Cannot share a post that does not exist!");
+		}
+		
+		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
+		post.setSharesPostId(sharesPostId);
+		
+		return save(post).getId();
 	}
 
 }
