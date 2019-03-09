@@ -26,7 +26,6 @@ import com.bacefook.model.User;
 import com.bacefook.service.CommentService;
 import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
-import com.bacefook.utility.TimeConverter;
 
 @CrossOrigin
 @RestController
@@ -46,35 +45,29 @@ public class CommentsController {
 	@PostMapping("/commentlikes")
 	public String addLikeToComment(@RequestParam("commentId") Integer commentId, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
+		
 		int userId = SessionManager.getLoggedUser(request);
 		commentsService.findById(commentId);
-//		commentsService.likeCommentById(userId, commentId);
 		dao.addLikeToComment(commentId, userId);
 		return "Comment " + commentId + " was liked";
 	}
 
 	@PostMapping("/commentreply")
-	public CommentDTO addReplyToComment(@RequestParam("commentId") Integer commentId,
+	public void addReplyToComment(@RequestParam("commentId") Integer commentId,
 			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
 
-		// TODO move to service layer
 		User user = userService.findById(SessionManager.getLoggedUser(request));
-		Comment comment = commentsService.findById(commentId);
-		Comment reply = new Comment(null, user.getId(), comment.getPostId(), commentId, commentContentDto.getContent(),
-				LocalDateTime.now());
-		commentsService.save(reply);
-		CommentDTO dto = new CommentDTO(reply.getCommentedOnId(), reply.getId(), user.getFullName(), reply.getContent(),
-				TimeConverter.convertTimeToString(reply.getPostingTime()));
-		return dto;
+		commentsService.replyTo(user, commentId, commentContentDto);
 	}
 
 	@PostMapping("/comments")
 	public Integer addCommentToPost(@RequestParam("postId") Integer postId,
 			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
-		postService.findById(postId);
+		
 		int posterId = SessionManager.getLoggedUser(request);
+		postService.findById(postId);
 		if (commentContentDto.getContent().isEmpty()) {
 			throw new ElementNotFoundException("Cannot add comment with empty content!");
 		}

@@ -1,17 +1,15 @@
 package com.bacefook.controller;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.management.relation.RelationException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,52 +25,32 @@ public class RelationsController {
 	private UserService userService;
 
 	@GetMapping("{id}/friends")
-	public Set<UserSummaryDTO> getFriendsOfUser(@PathVariable Integer id)
-			throws ElementNotFoundException {
-		
-		return 	userService.
-				findById(id)
-				.getFriends()
-				.stream()
-				.map(user -> {
-					UserSummaryDTO userDTO = null;
-					new ModelMapper().map(user, userDTO);
-					return userDTO;
-				})
-				.collect(Collectors.toSet());
+	public List<UserSummaryDTO> getFriendsOfUser(@PathVariable Integer id) throws ElementNotFoundException {
+		// TODO validate
+		return userService.findAllFriendOf(id);
 	}
 
-	@PutMapping("{id}/friendrequest")
-	public void sendFriendRequest(@PathVariable Integer id, HttpServletRequest request)
+	@PostMapping("{id}/friendrequest")
+	public String sendFriendRequest(@PathVariable Integer id, HttpServletRequest request)
 			throws RelationException, UnauthorizedException, ElementNotFoundException {
 
 		userService.sendFriendRequest(SessionManager.getLoggedUser(request), id);
-		// TODO
+		return "Friend request was send to " + userService.findById(id).getFullName();
 	}
 
-	@GetMapping("friendrequests")
-	public List<UserSummaryDTO> getAllFriendRequests(HttpServletRequest request) 
-			throws UnauthorizedException {
-		
+	@GetMapping("/friendrequests")
+	public List<UserSummaryDTO> getAllFriendRequests(HttpServletRequest request) throws UnauthorizedException {
+
 		Integer receiverId = SessionManager.getLoggedUser(request);
-		
-		return userService
-				.findAllFromRequestsTo(receiverId)
-				.stream()
-				.map(user -> {
-					UserSummaryDTO friendDTO = null;
-					new ModelMapper().map(user, friendDTO); 
-					return friendDTO;
-				})
-				.collect(Collectors.toList());
+		return userService.findAllFromRequestsTo(receiverId);
 	}
 
-	// TODO add to postman
 	@PutMapping("{senderId}/acceptrequest")
-	public void acceptFriendRequest(@PathVariable Integer senderId, HttpServletRequest request) 
-			throws UnauthorizedException {
-		
+	public String acceptFriendRequest(@PathVariable Integer senderId, HttpServletRequest request)
+			throws UnauthorizedException, RelationException, ElementNotFoundException {
+		// TODO validate if there is friend request, if you are not already friends
 		Integer receiverId = SessionManager.getLoggedUser(request);
 		userService.confirmFriendRequest(receiverId, senderId);
+		return "You are now friends with " + userService.findById(senderId).getFullName();
 	}
 }

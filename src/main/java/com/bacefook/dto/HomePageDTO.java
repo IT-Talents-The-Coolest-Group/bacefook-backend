@@ -1,6 +1,5 @@
 package com.bacefook.dto;
 
-import java.util.HashMap;
 import java.util.List;
 
 import lombok.Data;
@@ -9,7 +8,9 @@ import lombok.NonNull;
 @Data
 public class HomePageDTO {
 	@NonNull
-	private HashMap<String, UserSummaryDTO> loggedUser;
+	private NavigationBarDTO navBar;
 	@NonNull
-	private HashMap<String, List<PostDTO>> allPosts;
+	private UserSummaryDTO loggedUser;
+	@NonNull
+	private List<PostDTO> allPosts;
 }

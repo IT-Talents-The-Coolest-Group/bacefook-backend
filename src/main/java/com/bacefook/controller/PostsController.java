@@ -2,9 +2,7 @@ package com.bacefook.controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.dto.HomePageDTO;
+import com.bacefook.dto.NavigationBarDTO;
 import com.bacefook.dto.PostContentDTO;
 import com.bacefook.dto.PostDTO;
 import com.bacefook.exception.ElementNotFoundException;
@@ -29,7 +28,6 @@ import com.bacefook.model.User;
 import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
 
-//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class PostsController {
@@ -39,20 +37,26 @@ public class PostsController {
 	@Autowired
 	private UserService userService;
 	private ModelMapper mapper = new ModelMapper();
-
+	/**
+	 * retrieves info for home page and navigation bar
+	 ***/
 	@GetMapping("/home")
-	public HomePageDTO homePage(HttpServletRequest request)
+	public HomePageDTO homePage(HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
-		
+
 		Integer userId = SessionManager.getLoggedUser(request);
 		User loggedUser = userService.findById(userId);
-		UserSummaryDTO user = new UserSummaryDTO(loggedUser.getFirstName(), loggedUser.getLastName());// TODO profile picture,cover photo
-		HashMap<String, UserSummaryDTO> userMap = new HashMap<>();
 		
-		userMap.put("loggedUser", user);
+		NavigationBarDTO navUser = new NavigationBarDTO();
+		this.mapper.map(loggedUser, navUser);
+		navUser.setFriendRequestsCount(userService.findAllFromRequestsTo(userId).size());
+		navUser.setProfilePhotoUrl(userService.findProfilePhotoUrl(userId));
+		
+		UserSummaryDTO user = new UserSummaryDTO();
+		mapper.map(loggedUser, user);
+//		user.setFriendsCount(userService.getFriendsCountOF(userId));
 		List<Post> posts = postsService.findAllPostsFromFriends(userId);
 		List<PostDTO> allFriendsPosts = new ArrayList<PostDTO>(posts.size());
-		
 		for (Post post : posts) {
 			PostDTO postDTO = new PostDTO();
 			this.mapper.map(post, postDTO);
@@ -60,16 +64,46 @@ public class PostsController {
 			postDTO.setPosterFullName(posterFullName);
 			allFriendsPosts.add(postDTO);
 		}
-		
-		HashMap<String, List<PostDTO>> friendsPostsMap = new HashMap<>();
-		friendsPostsMap.put("friendsPosts", allFriendsPosts);
-		int friendsRequests = userService.findAllFromRequestsTo(userId).size();
-		Map<String, Integer> requestsMap = new HashMap<>();
-		requestsMap.put("friendRequestsCount", friendsRequests);
 
-		HomePageDTO home = new HomePageDTO(userMap, friendsPostsMap);
+		HomePageDTO home = new HomePageDTO(navUser, user, allFriendsPosts);
 
 		return home;
+	}
+	
+	@GetMapping("/profile")
+	public ProfilePageDTO profilePage(@RequestParam Integer profileId,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+		ProfilePageDTO profile = new ProfilePageDTO();
+		if(SessionManager.isLogged(request)) {
+			Integer userId = SessionManager.getLoggedUser(request);
+			User loggedUser = userService.findById(userId);
+			
+			NavigationBarDTO navUser = new NavigationBarDTO();
+			this.mapper.map(loggedUser, navUser);
+			navUser.setFriendRequestsCount(userService.findAllFromRequestsTo(userId).size());
+			navUser.setProfilePhotoUrl(userService.findProfilePhotoUrl(userId));
+			
+			profile.setNavBar(navUser);
+		}	
+			//TODO logged user addiotional info
+			UserSummaryDTO user = new UserSummaryDTO();
+			mapper.map(userService.findById(profileId), user);
+			user.setProfilePhotoUrl(userService.findProfilePhotoUrl(profileId));
+			user.setFriendsCount(userService.getFriendsCountOF(profileId));
+			
+			List<Post> posts = postsService.findAllByUserId(profileId);
+			List<PostDTO> userPosts = new ArrayList<PostDTO>(posts.size());
+			for (Post post : posts) {
+				PostDTO postDTO = new PostDTO();
+				this.mapper.map(post, postDTO);
+				String posterFullName = userService.findById(post.getPosterId()).getFullName();
+				postDTO.setPosterFullName(posterFullName);
+				userPosts.add(postDTO);
+			}
+			profile.setUser(user);
+			profile.setUserPosts(userPosts);
+//			profile.setFriendsCount(friendsCount);
+			
+			return profile;
 	}
 
 	@PostMapping("/postlikes")
@@ -85,6 +119,7 @@ public class PostsController {
 		List<UserSummaryDTO> returnUsers = new ArrayList<UserSummaryDTO>();
 		for (User user : users) {
 			UserSummaryDTO dto = new UserSummaryDTO(user.getFirstName(), user.getLastName());
+//			dto.setFriendsCount(userService.getFriendsCountOF(user.getId()));
 			returnUsers.add(dto);
 		}
 		return returnUsers;
@@ -97,19 +132,48 @@ public class PostsController {
 	}
 
 	@PostMapping("/posts")
-	public Integer createPost(@RequestBody PostContentDTO postContentDto, HttpServletRequest request)
-			throws UnauthorizedException { // Exceptions
+	public Integer createPost(@RequestBody PostContentDTO contentDto, HttpServletRequest request)
+			throws UnauthorizedException, ElementNotFoundException {
+	
 		int posterId = SessionManager.getLoggedUser(request);
-		// TODO validate if properties are not empty
-
-		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
+		String content = contentDto.getContent();
+		
+		if (content == null || content.isEmpty()) {
+			throw new ElementNotFoundException("Write something before posting!");
+		}
+		
+		Post post = new Post(posterId, content, LocalDateTime.now());
 		postsService.save(post);
 		return post.getId();
 	}
 
+	@PostMapping("/postshares")
+	public Integer sharePost(@RequestParam("sharesPostId") Integer sharesPostId,
+			@RequestBody PostContentDTO postContentDto, HttpServletRequest request) 
+					throws UnauthorizedException, ElementNotFoundException {
+		
+		int posterId = SessionManager.getLoggedUser(request);
+		
+		return postsService.save(sharesPostId, posterId, postContentDto);
+	}
+
+	@GetMapping("/postshares")
+	public List<PostDTO> getAllPostShares(@RequestParam("postId") Integer postId) throws ElementNotFoundException {
+		List<Post> posts = postsService.findAllWhichSharePostId(postId);
+		List<PostDTO> postsDto = new ArrayList<>();
+		for (Post post : posts) {
+			String posterFullName = userService.findById(post.getPosterId()).getFullName();
+			PostDTO postDto = new PostDTO();
+			this.mapper.map(post, postDto);
+			postDto.setPosterFullName(posterFullName);
+			postsDto.add(postDto);
+		}
+		return postsDto;
+	}
+
 	@GetMapping("/posts")
-	public List<PostDTO> getAllPostsOfUser(@RequestParam("posterId") int posterId,
-			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+	public List<PostDTO> getAllPostsOfUser(@RequestParam("posterId") int posterId)
+			throws UnauthorizedException, ElementNotFoundException {
 
 		// TODO check if user is friend with poster
 		// SessionManager.getLoggedUser(request);
@@ -136,17 +200,17 @@ public class PostsController {
 	@PutMapping("/posts")
 	public void updateStatus(@RequestParam("postId") Integer postId, @RequestBody PostContentDTO content,
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
-		
-		if (!SessionManager.isLogged(request)) {
-			throw new UnauthorizedException("You are not logged in! Please log in before trying to update your posts");
-		}	
+
 		if (content.getContent().isEmpty()) {
 			throw new ElementNotFoundException("Cannot update post with empty content!");
 		}
 		
-		System.out.println(content);
-
+		Integer userId = SessionManager.getLoggedUser(request);
 		Post post = postsService.findById(postId);
+		
+		if (!post.getPosterId().equals(userId)) {
+			throw new UnauthorizedException("Cannot update someone else's post!");
+		}
 		post.setContent(content.getContent());
 		postsService.save(post);
 	}

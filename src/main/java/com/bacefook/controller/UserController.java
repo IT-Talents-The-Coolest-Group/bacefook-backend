@@ -3,6 +3,7 @@ package com.bacefook.controller;
 import java.io.IOException;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
@@ -39,6 +42,14 @@ public class UserController {
 				"https://bacefookcommunity.postman.co/collections/6778985-5d93e005-f4f3-49fb-bc1d-956ce5e813fa?workspace=1bf0d2e0-4007-4e35-8219-38fec2a53b9d&fbclid=IwAR3xRCIhE9w4EKR-YEC2Hvt111icy21wEpQ5JgQgvjzVguz_OIfLa2i8fJs");
 	}
 
+	@GetMapping("/users/search")
+	public List<UserSummaryDTO> getAllUsersBySearch(@RequestParam String input,HttpServletRequest request) throws UnauthorizedException {
+		Integer userId = SessionManager.getLoggedUser(request);
+		List<UserSummaryDTO> users = userService.searchByNameOrderedAndLimited(input, userId);
+		System.out.println(users);
+		return users;
+	}
+
 	@PostMapping("/users/changepassword")
 	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UnauthorizedException,
@@ -50,9 +61,9 @@ public class UserController {
 	}
 
 	@PostMapping("/signup")
-	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request,
-			HttpServletResponse response) throws InvalidUserCredentialsException, ElementNotFoundException,
-			NoSuchAlgorithmException, UnauthorizedException, IOException {
+	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request, HttpServletResponse response)
+			throws InvalidUserCredentialsException, ElementNotFoundException, NoSuchAlgorithmException,
+			UnauthorizedException, IOException {
 
 		UserValidation.validate(signUp);
 		if (SessionManager.isLogged(request)) {
@@ -65,7 +76,7 @@ public class UserController {
 
 		User user = userService.save(signUp);
 		SessionManager.signInUser(request, user);
-		
+
 		return user.getId();
 	}
 

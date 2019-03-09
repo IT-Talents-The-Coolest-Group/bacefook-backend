@@ -13,13 +13,13 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class UserSummaryDTO {
 	
+	private Integer id;
 	@NonNull 
 	private String firstName;
 	@NonNull 
 	private String lastName;
-	private Integer friendsCount;
+	private String profilePhotoUrl;
+	private Integer friendsCount;	
 	
-//	@NonNull // TODO implement
-//	private String profilePhotoUrl;
 
 }
