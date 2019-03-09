@@ -21,7 +21,7 @@ public class UserDAO {
 
 	private static final String FIND_ALL_FRIENDS_OF = "SELECT id FROM (SELECT DISTINCT sender_id, receiver_id FROM relations "
 			+ "WHERE (sender_id = ? OR receiver_id = ?) AND is_confirmed = " + CONFIRMED + ") r "
-			+ "JOIN users u ON (u.id = r.sender_id OR u.id = r.receiver_id) " + "WHERE id <> ?;";
+			+ "JOIN users u ON (u.id = r.sender_id OR u.id = r.receiver_id) WHERE id <> ?;";
 
 	private static final String GET_USERS_BY_STRING_ORDER_BY_YOUR_FRIENDS = "SELECT DISTINCT "
 			+ "u.id AS userId,r.is_confirmed FROM users u "

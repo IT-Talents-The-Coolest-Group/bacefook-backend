@@ -98,7 +98,6 @@ public class PostsController {
 			throws UnauthorizedException, ElementNotFoundException {
 	
 		int posterId = SessionManager.getLoggedUser(request);
-		//String content = postContentDto.getContent();
 		
 		if (content == null || content.isEmpty()) {
 			throw new ElementNotFoundException("Write something before posting!");
@@ -163,16 +162,16 @@ public class PostsController {
 	public void updateStatus(@RequestParam("postId") Integer postId, @RequestBody PostContentDTO content,
 			HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
 
-		if (!SessionManager.isLogged(request)) {
-			throw new UnauthorizedException("You are not logged in! Please log in before trying to update your posts");
-		}
 		if (content.getContent().isEmpty()) {
 			throw new ElementNotFoundException("Cannot update post with empty content!");
 		}
-
-		System.out.println(content);
-
+		
+		Integer userId = SessionManager.getLoggedUser(request);
 		Post post = postsService.findById(postId);
+		
+		if (!post.getPosterId().equals(userId)) {
+			throw new UnauthorizedException("Cannot update someone else's post!");
+		}
 		post.setContent(content.getContent());
 		postsService.save(post);
 	}

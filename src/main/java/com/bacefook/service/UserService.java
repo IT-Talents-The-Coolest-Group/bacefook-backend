@@ -98,6 +98,10 @@ public class UserService {
 			throw new RelationException("You have already sent a request to that person!"); 
 		}
 		
+		if (userDAO.findAllFriendsOf(senderId).contains(receiverId)) {
+			throw new RelationException("You are already friends!");
+		}
+		
 		relationsRepo.save(friendRequest);
 	}
 
@@ -130,8 +134,10 @@ public class UserService {
 	}
 	
 	public List<UserSummaryDTO> findAllFriendOf(Integer userId){
+		
 		List<Integer> friendsIds = userDAO.findAllFriendsOf(userId);
 		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();
+		
 		for (Integer id : friendsIds) {
 			Optional<User> user = usersRepo.findById(id);
 			
