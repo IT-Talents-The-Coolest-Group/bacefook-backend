@@ -71,10 +71,41 @@ public class PostsController {
 		return home;
 	}
 	
-//	@GetMapping("/profile")
-//	public ProfilePageDTO profilePage() {
-//		
-//	}
+	@GetMapping("/profile")
+	public ProfilePageDTO profilePage(@RequestParam Integer profileId,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+		ProfilePageDTO profile = new ProfilePageDTO();
+		if(SessionManager.isLogged(request)) {
+			Integer userId = SessionManager.getLoggedUser(request);
+			User loggedUser = userService.findById(userId);
+			
+			NavigationBarDTO navUser = new NavigationBarDTO();
+			this.mapper.map(loggedUser, navUser);
+			navUser.setFriendRequestsCount(userService.findAllFromRequestsTo(userId).size());
+			navUser.setProfilePhotoUrl(userService.findProfilePhotoUrl(userId));
+			
+			profile.setNavBar(navUser);
+		}	
+			//TODO logged user addiotional info
+			UserSummaryDTO user = new UserSummaryDTO();
+			mapper.map(userService.findById(profileId), user);
+			user.setProfilePhotoUrl(userService.findProfilePhotoUrl(profileId));
+			user.setFriendsCount(userService.getFriendsCountOF(profileId));
+			
+			List<Post> posts = postsService.findAllByUserId(profileId);
+			List<PostDTO> userPosts = new ArrayList<PostDTO>(posts.size());
+			for (Post post : posts) {
+				PostDTO postDTO = new PostDTO();
+				this.mapper.map(post, postDTO);
+				String posterFullName = userService.findById(post.getPosterId()).getFullName();
+				postDTO.setPosterFullName(posterFullName);
+				userPosts.add(postDTO);
+			}
+			profile.setUser(user);
+			profile.setUserPosts(userPosts);
+//			profile.setFriendsCount(friendsCount);
+			
+			return profile;
+	}
 
 	@PostMapping("/postlikes")
 	public void likeAPost(@RequestParam("postId") Integer postId, HttpServletRequest request)

@@ -2,17 +2,18 @@ package com.bacefook.dto;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProfilePageDTO {
+	private NavigationBarDTO navBar;
 	@NonNull
 	private UserSummaryDTO user;
 	@NonNull
 	private List<PostDTO> userPosts;
-	@NonNull
-	private Integer friendsCount;
-	@NonNull
-	private Integer friendsRequestsCount;
 }

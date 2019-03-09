@@ -16,7 +16,7 @@ public class PostDAO {
 			+ CONFIRMED + ")"
 			+ "UNION "
 			+ "(SELECT p.id,p.posting_time FROM relations r JOIN posts p ON(r.sender_id=p.poster_id) WHERE r.receiver_id=? AND r.is_confirmed="
-			+ CONFIRMED + ")) " + "post " + "ORDER BY post.posting_time;";
+			+ CONFIRMED + ")) " + "post " + "ORDER BY post.posting_time DESC;";
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;

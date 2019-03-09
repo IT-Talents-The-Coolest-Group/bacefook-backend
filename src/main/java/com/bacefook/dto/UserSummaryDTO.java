@@ -18,8 +18,8 @@ public class UserSummaryDTO {
 	private String firstName;
 	@NonNull 
 	private String lastName;
-	
+	private String profilePhotoUrl;
 	private Integer friendsCount;	
-//	private String profilePhotoUrl;
+	
 
 }
