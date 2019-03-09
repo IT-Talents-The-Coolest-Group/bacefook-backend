@@ -110,6 +110,9 @@ public class UserService {
 		relationsRepo.save(relation);
 	}
 	
+	/**
+	 * find all friend requests by user
+	 * **/
 	public List<UserSummaryDTO> findAllFromRequestsTo(Integer userId) {
 		List<Integer> userIds = userDAO.findAllRequestsTo(userId);
 				
@@ -128,7 +131,9 @@ public class UserService {
 		
 		return users;
 	}
-	
+	/**
+	 * find all friends by user
+	 * **/
 	public List<UserSummaryDTO> findAllFriendOf(Integer userId){
 		List<Integer> friendsIds = userDAO.findAllFriendsOf(userId);
 		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();
@@ -149,7 +154,10 @@ public class UserService {
 	public int getFriendsCountOF(Integer userId) {
 		return userDAO.findAllFriendsOf(userId).size();
 	}
-	
+	/**
+	 * find search matches 
+	 * show them by Profile picture, Full name and Friends count
+	 * **/
 	public List<UserSummaryDTO> searchByNameOrderedAndLimited(String search,Integer userId) {
 		List<Integer> ids = userDAO.getAllSearchingMatchesOrderedByIfFriend(userId, search);
 		System.out.println(ids);

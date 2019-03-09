@@ -8,9 +8,9 @@ import lombok.NonNull;
 @Data
 public class HomePageDTO {
 	@NonNull
+	private NavigationBarDTO navBar;
+	@NonNull
 	private UserSummaryDTO loggedUser;
 	@NonNull
 	private List<PostDTO> allPosts;
-	@NonNull
-	private Integer friendRequestsCount;
 }

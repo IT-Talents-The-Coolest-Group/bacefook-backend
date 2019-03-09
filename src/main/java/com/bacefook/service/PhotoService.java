@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,9 @@ public class PhotoService {
 	@Autowired
 	private PostService postsService;
 	
+	private ModelMapper mapper = new ModelMapper();
+
+	
 	private static final Cloudinary cloudinary = new Cloudinary(                                                                      "cloudinary://763529519438114:rCTrP8RNpMEiCVzYZNnZlVx5sxw@bacefook");
 	
 	@Transactional
@@ -52,7 +56,7 @@ public class PhotoService {
 			Post post = postsService.save(new Post(userId, "", LocalDateTime.now()));
 			Photo photo = photosRepo.save(new Photo(post.getId(), url));
 			
-			return new PhotoDTO(photo.getId(), photo.getUrl(), post);
+			return new PhotoDTO(photo.getId(), photo.getUrl(), post.getId());
 		} 
 		catch (IOException e) {
 			throw new UnprocessableFileException("Could not your process image, sorry!");
@@ -99,15 +103,18 @@ public class PhotoService {
 		usersInfoRepo.save(info);
 	}
 
-	public List<Photo> getAllPhotosOfUser(Integer userId) {
+	public List<PhotoDTO> getAllPhotosOfUser(Integer userId) {
 		
 		List<Integer> photoIds = photosRepo.findAllPhotosOfUser(userId);
-		List<Photo> photos = new LinkedList<Photo>();
+		List<PhotoDTO> photos = new LinkedList<PhotoDTO>();
 		
 		for (Integer integer : photoIds) {
 			Optional<Photo> optionalPhoto = photosRepo.findById(integer);
 			if (optionalPhoto.isPresent()) {
-				photos.add(optionalPhoto.get());
+				Photo photo = optionalPhoto.get();
+				PhotoDTO dto = new PhotoDTO();
+				this.mapper.map(photo, dto);
+				photos.add(dto);
 			}
 		}
 		

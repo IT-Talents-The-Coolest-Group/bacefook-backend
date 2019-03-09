@@ -1,20 +1,19 @@
 package com.bacefook.dto;
 
-import com.bacefook.model.Post;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PhotoDTO {
+public class NavigationBarDTO {
+//	@NonNull
+//	private Integer id; //TODO id?
 	@NonNull
-	private Integer id;
+	private String firstName;
+	private String profilePhotoUrl;
 	@NonNull
-	private String url;
-	@NonNull
-	private Integer postId;
+	private Integer friendRequestsCount;
 }

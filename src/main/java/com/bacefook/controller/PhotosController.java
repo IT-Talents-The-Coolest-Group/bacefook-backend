@@ -1,6 +1,6 @@
 package com.bacefook.controller;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +19,6 @@ import com.bacefook.dto.PhotoDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.exception.UnprocessableFileException;
-import com.bacefook.model.Photo;
 import com.bacefook.service.PhotoService;
 
 @RestController
@@ -28,32 +27,32 @@ public class PhotosController {
 	@Autowired
 	private PhotoService photoService;
 
-	@PostMapping("uploadphoto")
+	@PostMapping("/uploadphoto")
 	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request, HttpServletResponse response)
 					throws UnprocessableFileException, UnauthorizedException {
 
 		Integer userId = SessionManager.getLoggedUser(request);
 		PhotoDTO photoDto = photoService.save(input, userId);
-		
-		try {
-			response.sendRedirect(photoDto.getUrl());
-		} 
-		catch (IOException e) {
-			throw new UnprocessableFileException("Could not open the photo, invalid url was generated..", e);
-		}
+//		try {
+//			response.sendRedirect(photoDto.getUrl());
+//		} 
+//		catch (IOException e) {
+//			throw new UnprocessableFileException("Could not open the photo, invalid url was generated..", e);
+//		}
 		return photoDto;
 	}
 	
-	@PutMapping("profilephoto/{photoId}")
-	public void updateProfilePhoto(@PathVariable Integer photoId, HttpServletRequest request) 
+	@PutMapping("/profilephoto/{photoId}")
+	public String updateProfilePhoto(@PathVariable Integer photoId, HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
 		
 		Integer userId = SessionManager.getLoggedUser(request);
 		
 		photoService.updateProfilePhoto(photoId, userId);
+		return "You changed your profile photo succesfylly!";
 	}
 	
-	@PutMapping("coverphoto/{photoId}")
+	@PutMapping("/coverphoto/{photoId}")
 	public void updateCoverPhoto(@PathVariable Integer photoId, HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
 		
@@ -62,8 +61,8 @@ public class PhotosController {
 		photoService.updateCoverPhoto(photoId, userId);
 	}
 	
-	@GetMapping("user/{userId}/photos")
-	public List<Photo> getAllPhotosOfUser(@PathVariable Integer userId) {
+	@GetMapping("/users/{userId}/photos")
+	public List<PhotoDTO> getAllPhotosOfUser(@PathVariable Integer userId) {
 		return photoService.getAllPhotosOfUser(userId);
 	}
 	

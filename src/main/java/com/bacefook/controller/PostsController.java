@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.dto.HomePageDTO;
+import com.bacefook.dto.NavigationBarDTO;
 import com.bacefook.dto.PostContentDTO;
 import com.bacefook.dto.PostDTO;
+import com.bacefook.dto.ProfilePageDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Post;
@@ -36,7 +38,9 @@ public class PostsController {
 	@Autowired
 	private UserService userService;
 	private ModelMapper mapper = new ModelMapper();
-
+	/**
+	 * retrieves info for home page and navigation bar
+	 ***/
 	@GetMapping("/home")
 	public HomePageDTO homePage(HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
@@ -44,13 +48,14 @@ public class PostsController {
 		Integer userId = SessionManager.getLoggedUser(request);
 		User loggedUser = userService.findById(userId);
 		
+		NavigationBarDTO navUser = new NavigationBarDTO();
+		this.mapper.map(loggedUser, navUser);
+		navUser.setFriendRequestsCount(userService.findAllFromRequestsTo(userId).size());
+		navUser.setProfilePhotoUrl(userService.findProfilePhotoUrl(userId));
+		
 		UserSummaryDTO user = new UserSummaryDTO();
 		mapper.map(loggedUser, user);
-		user.setFriendsCount(userService.getFriendsCountOF(userId));
-		user.setProfilePhotoUrl(userService.findProfilePhotoUrl(userId));
-
-		//TODO remove friends count from UserSummaryDTO, property is for /profile, no point setting it for the home page
-		// TODO profile picture
+//		user.setFriendsCount(userService.getFriendsCountOF(userId));
 		List<Post> posts = postsService.findAllPostsFromFriends(userId);
 		List<PostDTO> allFriendsPosts = new ArrayList<PostDTO>(posts.size());
 		for (Post post : posts) {
@@ -61,12 +66,15 @@ public class PostsController {
 			allFriendsPosts.add(postDTO);
 		}
 
-		int friendsRequests = userService.findAllFromRequestsTo(userId).size();
-
-		HomePageDTO home = new HomePageDTO(user, allFriendsPosts,friendsRequests);
+		HomePageDTO home = new HomePageDTO(navUser, user, allFriendsPosts);
 
 		return home;
 	}
+	
+//	@GetMapping("/profile")
+//	public ProfilePageDTO profilePage() {
+//		
+//	}
 
 	@PostMapping("/postlikes")
 	public void likeAPost(@RequestParam("postId") Integer postId, HttpServletRequest request)
@@ -81,7 +89,7 @@ public class PostsController {
 		List<UserSummaryDTO> returnUsers = new ArrayList<UserSummaryDTO>();
 		for (User user : users) {
 			UserSummaryDTO dto = new UserSummaryDTO(user.getFirstName(), user.getLastName());
-			dto.setFriendsCount(userService.getFriendsCountOF(user.getId()));
+//			dto.setFriendsCount(userService.getFriendsCountOF(user.getId()));
 			returnUsers.add(dto);
 		}
 		return returnUsers;
