@@ -240,10 +240,10 @@ public class UserService {
 		
 		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
 		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
-		int id = save(user);
-		UserInfo info = new UserInfo();
-		info.setId(id);
-		save(info);
+		save(user);
+//		UserInfo info = new UserInfo();
+//		info.setId(id);
+//		save(info);
 		return user;
 	}
 	
@@ -251,7 +251,7 @@ public class UserService {
 		return usersInfoRepo.findAll();
 	}
 	
-	public Integer save(UserInfo info) throws ElementNotFoundException {
+	public UserInfo save(UserInfo info) throws ElementNotFoundException {
 		Optional<User> user = usersRepo.findById(info.getId());
 		if(!user.isPresent()) {
 			throw new ElementNotFoundException("No such user! Register before you can setup your profile.");
@@ -262,7 +262,7 @@ public class UserService {
 		if(info.getCoverPhotoId()!=null && !photoService.getIfUserHasPhotoById(info.getId(), info.getCoverPhotoId())) {
 			throw new ElementNotFoundException("You are not the owner of this photo!");
 		}
-		return usersInfoRepo.save(info).getId();
+		return usersInfoRepo.save(info);
 	}
 	
 }

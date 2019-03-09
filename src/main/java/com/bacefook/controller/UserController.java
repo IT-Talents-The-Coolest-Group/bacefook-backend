@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.UserInfoDTO;
 import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.User;
+import com.bacefook.model.UserInfo;
 import com.bacefook.security.Cryptography;
 import com.bacefook.service.UserService;
 import com.bacefook.utility.UserValidation;
@@ -35,6 +38,7 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	private ModelMapper mapper = new ModelMapper();
 
 	@GetMapping("/")
 	public void startingPage(HttpServletResponse response) throws IOException {
@@ -107,6 +111,15 @@ public class UserController {
 		} else {
 			throw new UnauthorizedException("You are not logged in!");
 		}
+	}
+	
+	@PostMapping("/users/setup")
+	public int setUpProfile(@RequestBody UserInfoDTO infoDto,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+		int userId = SessionManager.getLoggedUser(request);
+		UserInfo info = new UserInfo();
+		this.mapper.map(infoDto, info);
+		info.setId(userId);
+		return userService.save(info).getId();
 	}
 
 }
