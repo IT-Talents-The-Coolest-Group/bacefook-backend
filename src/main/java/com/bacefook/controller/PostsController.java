@@ -47,6 +47,7 @@ public class PostsController {
 		UserSummaryDTO user = new UserSummaryDTO();
 		mapper.map(loggedUser, user);
 		user.setFriendsCount(userService.getFriendsCountOF(userId));
+		user.setProfilePhotoUrl(userService.findProfilePhotoUrl(userId));
 
 		//TODO remove friends count from UserSummaryDTO, property is for /profile, no point setting it for the home page
 		// TODO profile picture

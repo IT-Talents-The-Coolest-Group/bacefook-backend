@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bacefook.dao.ProfilePhotoDAO;
 import com.bacefook.dao.UserDAO;
 import com.bacefook.dto.SignUpDTO;
 import com.bacefook.dto.UserSummaryDTO;
@@ -40,7 +41,17 @@ public class UserService {
 	private UsersInfoRepository usersInfoRepo;
 	@Autowired
 	private UserDAO userDAO;
+	@Autowired
+	private ProfilePhotoDAO profilePhotoDAO;
 	private ModelMapper mapper = new ModelMapper();
+	
+	public String findProfilePhotoUrl(Integer userId) throws ElementNotFoundException {
+		List<String> url = profilePhotoDAO.findProfilePhotoUrl(userId);
+		if(url.isEmpty()) {
+			throw new ElementNotFoundException("No profile picture for this user!");
+		}
+		return url.get(0);
+	}
 	
 	
 	public User findByEmail(String email) throws ElementNotFoundException {
