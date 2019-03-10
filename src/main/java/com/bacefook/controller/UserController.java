@@ -38,7 +38,7 @@ public class UserController {
 
 	@GetMapping("/")
 	public void startingPage(HttpServletResponse response) throws IOException {
-		response.sendRedirect("https://documenter.getpostman.com/view/6800789/S11RKafa");
+		response.sendRedirect("https://documenter.getpostman.com/view/6800789/S11RKak4");
 	}
 
 	@GetMapping("/users/search")
