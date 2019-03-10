@@ -12,6 +12,8 @@ public interface CommentsRepository extends JpaRepository<Comment, Integer>{
 
 	public List<Comment> findAllByPostId(Integer posterId);
 	
+	public List<Comment> findAllByPosterId(Integer userId);
+	
 	public List<Comment> findAllByCommentedOnIdOrderByPostingTime(Integer commentedOnId);
 	
 }

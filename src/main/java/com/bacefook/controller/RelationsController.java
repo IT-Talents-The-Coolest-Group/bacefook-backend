@@ -20,7 +20,7 @@ import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.service.UserService;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @RestController
 public class RelationsController {
 	@Autowired

@@ -1,7 +1,6 @@
 package com.bacefook.service;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,6 +16,7 @@ import com.bacefook.dao.ProfilePhotoDAO;
 import com.bacefook.dao.RelationsDAO;
 import com.bacefook.dao.UserDAO;
 import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.UserInfoDTO;
 import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
@@ -83,16 +83,14 @@ public class UserService {
 		return url.get(0);
 	}
 	
-	
 	public User findByEmail(String email) throws ElementNotFoundException {
 		User user = usersRepo.findByEmail(email);
-		
 		if (user == null) {
 			throw new ElementNotFoundException("A user with that email does not exist!");
 		}
 		return user;
 	}
-	
+
 	public boolean emailIsTaken(String email) {
 		return usersRepo.findByEmail(email) != null;
 	}
@@ -111,50 +109,41 @@ public class UserService {
 		return usersRepo.save(user).getId();
 	}
 	
-	public void sendFriendRequest(Integer senderId, Integer receiverId) 
+	public Integer sendFriendRequest(Integer senderId, Integer receiverId) 
 			throws RelationException, ElementNotFoundException {
-		
 		Relation friendRequest = new Relation(senderId, receiverId, 0);
-		
 		if (senderId.equals(receiverId)) {
 			throw new RelationException("You cannot send a request to yourself!");
 		}
-		
 		if (!usersRepo.existsById(senderId) || !usersRepo.existsById(receiverId)) {
 			throw new ElementNotFoundException("A user with that ID does not exist!");
 		}
-		
 		if (relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId) != null) {
 			throw new RelationException("You have already sent a request to that person!"); 
 		}
-		
 		if (userDAO.findAllFriendsOf(senderId).contains(receiverId)) {
 			throw new RelationException("You are already friends!");
 		}
-		
-		relationsRepo.save(friendRequest);
+		return relationsRepo.save(friendRequest).getId();
 	}
 
-	public void confirmFriendRequest(Integer receiverId, Integer senderId) throws RelationException {
+	public Integer confirmFriendRequest(Integer receiverId, Integer senderId) throws RelationException {
 		Relation relation = relationsRepo.findBySenderIdAndReceiverId(senderId, receiverId);
 		if (relation == null) {
 			throw new RelationException("You do not have a request from that user!");
 		}
 		relation.setIsConfirmed(1);
-		relationsRepo.save(relation);
+		return relationsRepo.save(relation).getId();
 	}
-	
+
 	/**
-	 * find all friend requests by user
+	 * find all friend requests to user
 	 * **/
 	public List<UserSummaryDTO> findAllFromRequestsTo(Integer userId) {
-		List<Integer> userIds = userDAO.findAllRequestsTo(userId);
-				
+		List<Integer> userIds = userDAO.findAllRequestsTo(userId);	
 		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();
-		
 		for (Integer id : userIds) {
 			Optional<User> user = usersRepo.findById(id);
-			
 			if (user.isPresent()) {
 				UserSummaryDTO summary = new UserSummaryDTO();
 				mapper.map(user.get(), summary);
@@ -162,20 +151,16 @@ public class UserService {
 				users.add(summary);
 			}
 		}
-		
 		return users;
 	}
 	/**
 	 * find all friends by user
 	 * **/
 	public List<UserSummaryDTO> findAllFriendOf(Integer userId){
-		
 		List<Integer> friendsIds = userDAO.findAllFriendsOf(userId);
 		List<UserSummaryDTO> users = new LinkedList<UserSummaryDTO>();
-		
 		for (Integer id : friendsIds) {
 			Optional<User> user = usersRepo.findById(id);
-			
 			if (user.isPresent()) {
 				UserSummaryDTO summary = new UserSummaryDTO();
 				mapper.map(user.get(), summary);
@@ -183,7 +168,6 @@ public class UserService {
 				users.add(summary);
 			}
 		}
-		
 		return users;
 	}
 	
@@ -196,32 +180,24 @@ public class UserService {
 	 * **/
 	public List<UserSummaryDTO> searchByNameOrderedAndLimited(String search,Integer userId) {
 		List<Integer> ids = userDAO.getAllSearchingMatchesOrderedByIfFriend(userId, search);
-		System.out.println(ids);
-		List<User> users = new LinkedList<>();
+		List<UserSummaryDTO> usersDTO = new LinkedList<UserSummaryDTO>();
 		for (Integer integer : ids) {
 			Optional<User> user = usersRepo.findById(integer);
 			if(user.isPresent()) {
-			users.add(user.get());
-			}
-		}
-		System.out.println(users);
-		List<UserSummaryDTO> usersDTO = new ArrayList<UserSummaryDTO>(users.size());
-		
-		for (User user : users) {
 			UserSummaryDTO dto = new UserSummaryDTO();
-			this.mapper.map(user, dto);
-			dto.setFriendsCount(getFriendsCountOF(user.getId()));
+			this.mapper.map(user.get(), dto);
+			dto.setFriendsCount(getFriendsCountOF(user.get().getId()));
+			//TODO maybe set photo URL
 			usersDTO.add(dto);
+			}
 		}
 		return usersDTO;
 	}
 
 	public void changePassword(int userId, String oldPassword, String newPassword) 
 			throws ElementNotFoundException, NoSuchAlgorithmException, InvalidUserCredentialsException {
-		
 		User user = findById(userId);
 		String oldPass = Cryptography.cryptSHA256(oldPassword);
-		
 		// TODO implement safer equals
 		if (user.getPassword().equals(oldPass)) {
 			user.setPassword(Cryptography.cryptSHA256(newPassword));
@@ -234,23 +210,14 @@ public class UserService {
 
 	public User save(SignUpDTO signUp) 
 			throws NoSuchAlgorithmException, ElementNotFoundException {
-		
 		User user = new User();
 		this.mapper.map(signUp, user);
-		
 		user.setPassword(Cryptography.cryptSHA256(signUp.getPassword()));
 		user.setGenderId(genderService.findByGenderName(signUp.getGender()).getId());
 		save(user);
-//		UserInfo info = new UserInfo();
-//		info.setId(id);
-//		save(info);
 		return user;
 	}
-	
-	public List<UserInfo> findAllUsersInfo() {
-		return usersInfoRepo.findAll();
-	}
-	
+
 	public UserInfo save(UserInfo info) throws ElementNotFoundException {
 		Optional<User> user = usersRepo.findById(info.getId());
 		if(!user.isPresent()) {
@@ -265,4 +232,31 @@ public class UserService {
 		return usersInfoRepo.save(info);
 	}
 	
+	public UserInfoDTO getInfoByUserId(Integer userId) throws ElementNotFoundException {
+		if(userId==null) {
+			throw new ElementNotFoundException("User id must not be null!");
+		}
+		Optional<UserInfo> info =usersInfoRepo.findById(userId);
+		if(!info.isPresent()) {
+			throw new ElementNotFoundException("No additional info for this user!");
+		}
+		UserInfo userInfo = info.get();
+		UserInfoDTO dto = new UserInfoDTO();
+		this.mapper.map(userInfo, dto);
+		return dto;
+	}
+	//TODO concat 
+	public UserInfo findUserInfo(Integer userId) {
+		UserInfo info = null;
+		Optional<UserInfo> optionalInfo = usersInfoRepo.findById(userId);
+		if (optionalInfo.isPresent()) {
+			info = optionalInfo.get();
+		}
+		else {
+			info = new UserInfo();
+			info.setId(userId);
+		}
+		return info;
+	}
+
 }

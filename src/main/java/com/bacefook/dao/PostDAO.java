@@ -17,6 +17,9 @@ public class PostDAO {
 			+ "UNION "
 			+ "(SELECT p.id,p.posting_time FROM relations r JOIN posts p ON(r.sender_id=p.poster_id) WHERE r.receiver_id=? AND r.is_confirmed="
 			+ CONFIRMED + ")) " + "post " + "ORDER BY post.posting_time DESC;";
+	
+	private static final String DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
+	private static final String UNLIKE_POST = "DELETE FROM post_likes WHERE post_id= ? AND user_id = ?;";
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -26,6 +29,13 @@ public class PostDAO {
 			ps.setInt(1, id);
 			ps.setInt(2, id);
 		}, (resultSet, rowNum) -> resultSet.getInt("post"));
+	}
+	
+	public int deletePostById(int id) {
+		return jdbcTemplate.update(DELETE_POST_BY_ID, id);
+	}
+	public int unlikePost(Integer postId,Integer userId) {
+		return jdbcTemplate.update(UNLIKE_POST, postId, userId);
 	}
 
 }

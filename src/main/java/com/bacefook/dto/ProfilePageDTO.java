@@ -12,6 +12,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class ProfilePageDTO {
 	private NavigationBarDTO navBar;
+	private UserInfoDTO userInfo;
 	@NonNull
 	private UserSummaryDTO user;
 	@NonNull

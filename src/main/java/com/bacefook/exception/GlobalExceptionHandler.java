@@ -45,6 +45,10 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Object> handleInvalidUserError(InvalidUserCredentialsException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
+	@ExceptionHandler({AlreadyContainsException.class})
+	public ResponseEntity<Object> handleAlreadyContainsError(AlreadyContainsException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	} 
 	
 	@ExceptionHandler(RelationException.class)
 	public ResponseEntity<Object> handleRelationError(RelationException e) {
