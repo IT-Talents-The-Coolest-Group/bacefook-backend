@@ -4,4 +4,4 @@ This is the final assignment from [IT Talents](https://ittalents.bg/home), to re
 
 Hosted at [bacefookapi.herokuapp.com](https://bacefookapi.herokuapp.com).
 
-Documentation at [documenter.getpostman.com](https://documenter.getpostman.com/view/6800789/S11RKafa)
+Documentation at [documenter.getpostman.com](https://documenter.getpostman.com/view/6800789/S11RKak4)
