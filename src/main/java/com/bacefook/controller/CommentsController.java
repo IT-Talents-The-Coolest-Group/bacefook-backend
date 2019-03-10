@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,13 +21,12 @@ import com.bacefook.exception.AlreadyContainsException;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Comment;
-import com.bacefook.model.User;
 import com.bacefook.service.CommentLikeService;
 import com.bacefook.service.CommentService;
 import com.bacefook.service.PostService;
 import com.bacefook.service.UserService;
 
-@CrossOrigin(origins = "http://bacefook.herokuapp.com")
+//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @RestController
 public class CommentsController {
 	@Autowired
@@ -61,24 +59,14 @@ public class CommentsController {
 			return "Could not unlike comment.";
 		}
 	}
-	
-	@DeleteMapping("/comments/delete")
-	public String deleteComment(@RequestParam("commentId")Integer id,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
-		int userId = SessionManager.getLoggedUser(request);
-		List<Comment> comments = commentsService.findAllByUserId(userId);
-		if(!comments.contains(commentsService.findById(id))) {
-			throw new ElementNotFoundException("User have no rights for this comment!");
-		}
-		commentsService.deleteComment(id);
-		return "Comment was deleted";
-	}
 
 	@PostMapping("/commentreply")
 	public void addReplyToComment(@RequestParam("commentId") Integer commentId,
 			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
-		User user = userService.findById(SessionManager.getLoggedUser(request));
-		commentsService.replyTo(user, commentId, commentContentDto);
+		
+		Integer userId = SessionManager.getLoggedUser(request);
+		commentsService.replyTo(userId, commentId, commentContentDto);
 	}
 
 	@PostMapping("/comments")
@@ -104,6 +92,17 @@ public class CommentsController {
 		} else {
 			throw new UnauthorizedException("You are not logged in! Please log in before trying to update your posts.");
 		}
+	}
+	
+	@DeleteMapping("/comments/delete")
+	public String deleteComment(@RequestParam("commentId")Integer id,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+		int userId = SessionManager.getLoggedUser(request);
+		List<Comment> comments = commentsService.findAllByUserId(userId);
+		if(!comments.contains(commentsService.findById(id))) {
+			throw new ElementNotFoundException("User have no rights for this comment!");
+		}
+		commentsService.deleteComment(id);
+		return "Comment was deleted";
 	}
 
 	@GetMapping("/comments")

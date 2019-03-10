@@ -43,11 +43,13 @@ public class PostService {
 		return postDao.deletePostById(id);
 	}
 
-	public Integer saveSharing(Integer sharesPostId, int posterId, PostContentDTO postContentDto)
+	public Integer saveSharing(Integer sharesPostId, Integer posterId, PostContentDTO postContentDto)
 			throws ElementNotFoundException {
+	
 		if (!existsById(sharesPostId)) {
 			throw new ElementNotFoundException("Cannot share a post that does not exist!");
 		}
+		
 		Post post = new Post(posterId, postContentDto.getContent(), LocalDateTime.now());
 		post.setSharesPostId(sharesPostId);
 		return postsRepo.save(post).getId();
@@ -63,13 +65,16 @@ public class PostService {
 	public List<PostDTO> findAllPostsFromFriends(Integer loggerId) {
 		List<Integer> postIds = postDao.getAllPostsIdByFriends(loggerId);
 		List<PostDTO> posts = new ArrayList<PostDTO>(postIds.size());
+	
 		for (Integer id : postIds) {
 			Optional<Post> optional = postsRepo.findById(id);
+			
 			if (optional.isPresent()) {
 				Post post = optional.get();
 				PostDTO dto = new PostDTO();
 				this.mapper.map(post, dto);
 				Optional<User> u = usersRepo.findById(post.getPosterId());
+				
 				if (u.isPresent()) {
 					User user = u.get();
 					dto.setPosterFullName(user.getFullName());
@@ -92,13 +97,17 @@ public class PostService {
 
 	public List<PostDTO> postsConverter(List<Post> posts, Integer posterId) throws ElementNotFoundException {
 		List<PostDTO> dtos = new LinkedList<>();
+		
 		for (Post post : posts) {
 			PostDTO dto = new PostDTO();
 			this.mapper.map(post, dto);
+			
 			Optional<User> optional = usersRepo.findById(posterId);
+			
 			if (!optional.isPresent()) {
 				throw new ElementNotFoundException("A user with that ID does not exist!");
 			}
+			
 			User user = optional.get();
 			dto.setPosterFullName(user.getFullName());
 			dtos.add(dto);
@@ -113,19 +122,22 @@ public class PostService {
 
 	public Post findById(Integer postId) throws ElementNotFoundException {
 			Optional<Post> post = postsRepo.findById(postId);
-			if(post.isPresent()) {
-			return post.get();
+
+			if(!post.isPresent()) {
+				throw new ElementNotFoundException("No such post!");
 			}
-			throw new ElementNotFoundException("No such post!");
+			return post.get();
 	}
 
 	public List<PostDTO> findAllWhichSharePostId(Integer postId) {
 		List<Post> posts = postsRepo.findAllBySharesPostId(postId);
 		List<PostDTO> dtos = new LinkedList<>();
+	
 		for (Post post : posts) {
 			PostDTO dto = new PostDTO();
 			this.mapper.map(post, dto);
 			Optional<User> optional = usersRepo.findById(post.getPosterId());
+		
 			if (optional.isPresent()) {
 				String posterFullName = optional.get().getFullName();
 				dto.setPosterFullName(posterFullName);

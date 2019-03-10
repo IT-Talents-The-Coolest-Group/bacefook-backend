@@ -14,7 +14,6 @@ import com.bacefook.dto.CommentContentDTO;
 import com.bacefook.dto.CommentDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.model.Comment;
-import com.bacefook.model.User;
 import com.bacefook.repository.CommentsRepository;
 
 @Service
@@ -32,6 +31,7 @@ public class CommentService {
 		Comment comment = new Comment(posterId, postId, content, LocalDateTime.now());
 		return commentsRepo.save(comment).getId();
 	}
+	
 	public Integer update(Integer commentId,String content) throws ElementNotFoundException {
 		Comment comment = this.findById(commentId);
 		comment.setContent(content);
@@ -41,7 +41,6 @@ public class CommentService {
 	public int deleteComment(Integer id) {
 		return commentDAO.deleteCommentById(id);
 	}
-
 	
 	public Comment findById(Integer commentId) throws ElementNotFoundException {
 		try {
@@ -74,10 +73,12 @@ public class CommentService {
 		return replies;
 	}
 	
-	public void replyTo(User user, Integer commentId, CommentContentDTO commentContentDto) 
+	public void replyTo(Integer userId, Integer commentId, CommentContentDTO commentContentDto) 
 			throws ElementNotFoundException {
-		Comment reply = new Comment(user.getId(), findById(commentId).getPostId(), 
+		
+		Comment reply = new Comment(userId, findById(commentId).getPostId(), 
 				commentContentDto.getContent(), LocalDateTime.now());
+		
 		reply.setCommentedOnId(commentId);
 		commentsRepo.save(reply);
 	}
