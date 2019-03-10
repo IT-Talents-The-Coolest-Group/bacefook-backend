@@ -38,8 +38,7 @@ public class UserController {
 
 	@GetMapping("/")
 	public void startingPage(HttpServletResponse response) throws IOException {
-		response.sendRedirect(
-				"https://bacefookcommunity.postman.co/collections/6778985-5d93e005-f4f3-49fb-bc1d-956ce5e813fa?workspace=1bf0d2e0-4007-4e35-8219-38fec2a53b9d&fbclid=IwAR3xRCIhE9w4EKR-YEC2Hvt111icy21wEpQ5JgQgvjzVguz_OIfLa2i8fJs");
+		response.sendRedirect("https://documenter.getpostman.com/view/6800789/S11RKafa");
 	}
 
 	@GetMapping("/users/search")
