@@ -43,10 +43,10 @@ public class PhotosController {
 			throws UnauthorizedException, ElementNotFoundException {
 		Integer userId = SessionManager.getLoggedUser(request);
 		if (!photoService.getIfUserHasPhotoById(userId, photoId)) {
-			throw new UnauthorizedException("You are not owner of that photo!");
+			throw new UnauthorizedException("You do not own a photo with that id!");
 		}
 		photoService.updateProfilePhoto(photoId, userId);
-		return "You changed your profile photo succesfylly!";
+		return "You changed your profile photo successfully!";
 	}
 
 	@PutMapping("/coverphotos/{photoId}")
@@ -54,7 +54,7 @@ public class PhotosController {
 			throws UnauthorizedException, ElementNotFoundException {
 		Integer userId = SessionManager.getLoggedUser(request);
 		if (!photoService.getIfUserHasPhotoById(userId, photoId)) {
-			throw new UnauthorizedException("You are not owner of that photo!");
+			throw new UnauthorizedException("You do not own a photo with that id!");
 		}
 		photoService.updateCoverPhoto(photoId, userId);
 	}
