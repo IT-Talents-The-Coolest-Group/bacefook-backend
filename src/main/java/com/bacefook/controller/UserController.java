@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +29,7 @@ import com.bacefook.security.Cryptography;
 import com.bacefook.service.UserService;
 import com.bacefook.utility.UserValidation;
 
-@CrossOrigin(origins = "http://bacefook.herokuapp.com")
+//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @RestController
 public class UserController {
 
@@ -51,12 +50,12 @@ public class UserController {
 	}
 
 	@PostMapping("/users/changepassword")
-	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
+	public String changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UnauthorizedException,
 			ElementNotFoundException {
 		UserValidation.validate(passDto);
 		int userId = SessionManager.getLoggedUser(request);
-		userService.changePassword(userId, passDto.getOldPassword(), passDto.getNewPassword());
+		return userService.changePassword(userId, passDto.getOldPassword(), passDto.getNewPassword());
 	}
 
 	@PostMapping("/users/signup")
@@ -71,10 +70,8 @@ public class UserController {
 		if (userService.emailIsTaken(signUp.getEmail())) {
 			throw new InvalidUserCredentialsException("That email is already taken!");
 		}
-
 		User user = userService.save(signUp);
 		SessionManager.signInUser(request, user);
-
 		return user.getId();
 	}
 
@@ -107,12 +104,11 @@ public class UserController {
 	}
 	
 	@PostMapping("/users/setup")
-	public UserInfoDTO setUpProfile(@RequestBody UserInfoDTO infoDto,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException, AlreadyContainsException {
+	public Integer setUpProfile(@RequestBody UserInfoDTO infoDto,HttpServletRequest request) throws  ElementNotFoundException, AlreadyContainsException, InvalidUserCredentialsException, UnauthorizedException {
 		int userId = SessionManager.getLoggedUser(request);
 		if(userService.getInfoByPhone(infoDto.getPhone())!=null) {
 			throw new AlreadyContainsException("A user with that phone already exists");
 		}
-		return userService.save(infoDto,userId);
+		return userService.save(infoDto,userId).getId();
 	}
-
 }

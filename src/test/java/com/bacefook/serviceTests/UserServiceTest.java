@@ -11,14 +11,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.repository.RelationsRepository;
-import com.bacefook.service.UserService;
+import com.bacefook.service.RelationService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserServiceTest {
 
 	@Autowired
-	private UserService userService;
+	private RelationService relationService;
 	@MockBean
 	private RelationsRepository relationRepo;
 	
@@ -28,7 +28,7 @@ public class UserServiceTest {
 		Integer sender = 1;
 		Integer receiver = sender;
 		
-		userService.sendFriendRequest(sender, receiver);
+		relationService.sendFriendRequest(sender, receiver);
 	}
 	
 	// TODO mock repositories to give predefined collections or users, 
