@@ -11,6 +11,7 @@ import com.bacefook.exception.InvalidUserCredentialsException;
 public class UserValidation {
 
 	private static final int MIN_NAMES_LENGTH = 3;
+	private static final int MAX_NAMES_LENGTH = 30;
 	private static final int MIN_AGE = 13;
 	private static final int MAX_AGE = 120;
 	private final static String EMAIL_PATTERN = "^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+\\.[(a-zA-z)]{2,5}$";
@@ -34,14 +35,14 @@ public class UserValidation {
 
 	private static void validateBirthday(LocalDate birthday) throws InvalidUserCredentialsException{
 		Period period = Period.between(birthday, LocalDate.now());
-		if (period.getYears() >= MAX_AGE && period.getYears() < MIN_AGE) {
+		if (period.getYears() >= MAX_AGE || period.getYears() < MIN_AGE) {
 			throw new InvalidUserCredentialsException(
 					"Invalid birth date, must be older than " + (MIN_AGE - 1) + " and younger than " + MAX_AGE + "!");
 		}
 	}
 
 	private static void validateName(String name) throws InvalidUserCredentialsException {
-		if (isNullOrEmpty(name) || name.length() < MIN_NAMES_LENGTH) {
+		if (isNullOrEmpty(name) || name.length() < MIN_NAMES_LENGTH || name.length() > MAX_NAMES_LENGTH) {
 			throw new InvalidUserCredentialsException("Invalid name, must be longer than " + MIN_NAMES_LENGTH + "!");
 		}
 	}
