@@ -29,23 +29,23 @@ public class RelationService {
 	private RelationsRepository relationsRepo;
 	@Autowired
 	private RelationsDAO relationsDAO;
-	
+	@Autowired
+	private UserService userService;
+
 	private ModelMapper mapper = new ModelMapper();
-	
+
 	public String removeFromFriends(Integer loggedId, Integer friendId) {
 		int rows = relationsDAO.removeFromFriends(loggedId, friendId);
 		if (rows > 0) {
 			return "User id no longer friends with " + friendId;
-		} 
-		else {
+		} else {
 			return "User is not friends with " + friendId;
 		}
 	}
-	
 
 	public Integer sendFriendRequest(Integer senderId, Integer receiverId)
 			throws RelationException, ElementNotFoundException {
-	
+
 		Relation friendRequest = new Relation(senderId, receiverId, 0);
 		if (senderId.equals(receiverId)) {
 			throw new RelationException("You cannot send a request to yourself!");
@@ -67,7 +67,7 @@ public class RelationService {
 		if (relation == null) {
 			throw new RelationException("You do not have a request from that user!");
 		}
-		if(relation.getIsConfirmed().equals(1)) {
+		if (relation.getIsConfirmed().equals(1)) {
 			throw new RelationException("You are already friends!");
 		}
 		relation.setIsConfirmed(1);
@@ -91,8 +91,11 @@ public class RelationService {
 		}
 		return users;
 	}
+
 	/**
 	 * find all friends by user
+	 * 
+	 * @throws ElementNotFoundException
 	 **/
 	public List<UserSummaryDTO> findAllFriendOf(Integer userId) {
 		List<Integer> friendsIds = userDAO.findAllFriendsOf(userId);
@@ -103,6 +106,13 @@ public class RelationService {
 				UserSummaryDTO summary = new UserSummaryDTO();
 				mapper.map(user.get(), summary);
 				summary.setFriendsCount(getFriendsCountOF(user.get().getId()));
+				String url = null;
+				try {
+					url = userService.findProfilePhotoUrl(userId);
+				} catch (ElementNotFoundException e) {
+					System.out.println(userId + " has no profile picture");
+				}
+				summary.setProfilePhotoUrl(url);
 				users.add(summary);
 			}
 		}
@@ -117,18 +127,16 @@ public class RelationService {
 		int rows = relationsDAO.cancelFriendRequest(loggedId, receiverId);
 		if (rows > 0) {
 			return "You canceled a friend request to " + receiverId;
-		} 
-		else {
+		} else {
 			throw new RelationException("Sorry, but you have not sent a friend request to this user.");
 		}
 	}
-	
+
 	public String deleteFriendRequest(Integer loggedId, Integer senderId) throws RelationException {
 		int rows = relationsDAO.cancelFriendRequest(loggedId, senderId);
 		if (rows > 0) {
 			return "You deleted a friend request from " + senderId;
-		} 
-		else {
+		} else {
 			throw new RelationException("Sorry, but you have not received a friend request from this user.");
 		}
 	}
