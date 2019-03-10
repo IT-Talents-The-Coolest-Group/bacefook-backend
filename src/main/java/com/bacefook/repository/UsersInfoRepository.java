@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.bacefook.model.UserInfo;
 
 public interface UsersInfoRepository extends JpaRepository<UserInfo, Integer> {
-
+	public UserInfo findByPhone(String phone);
 }

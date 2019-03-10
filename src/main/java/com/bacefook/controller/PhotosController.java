@@ -29,35 +29,38 @@ public class PhotosController {
 	private PhotoService photoService;
 
 	@PostMapping("photos/uploadphoto")
-	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request, HttpServletResponse response)
-					throws UnprocessableFileException, UnauthorizedException, ElementNotFoundException {
+	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request,
+			HttpServletResponse response)
+			throws UnprocessableFileException, UnauthorizedException, ElementNotFoundException {
 
 		Integer userId = SessionManager.getLoggedUser(request);
 		PhotoDTO photoDto = photoService.save(input, userId);
 		return photoDto;
 	}
-	
+
 	@PutMapping("/profilephotos/{photoId}")
-	public String updateProfilePhoto(@PathVariable Integer photoId, HttpServletRequest request) 
+	public String updateProfilePhoto(@PathVariable Integer photoId, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
-		
 		Integer userId = SessionManager.getLoggedUser(request);
-		
+		if (!photoService.getIfUserHasPhotoById(userId, photoId)) {
+			throw new UnauthorizedException("You are not owner of that photo!");
+		}
 		photoService.updateProfilePhoto(photoId, userId);
 		return "You changed your profile photo succesfylly!";
 	}
-	
+
 	@PutMapping("/coverphotos/{photoId}")
-	public void updateCoverPhoto(@PathVariable Integer photoId, HttpServletRequest request) 
+	public void updateCoverPhoto(@PathVariable Integer photoId, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
-		
 		Integer userId = SessionManager.getLoggedUser(request);
-		
+		if (!photoService.getIfUserHasPhotoById(userId, photoId)) {
+			throw new UnauthorizedException("You are not owner of that photo!");
+		}
 		photoService.updateCoverPhoto(photoId, userId);
 	}
-	
+
 	@GetMapping("/users/{userId}/photos")
 	public List<PhotoDTO> getAllPhotosOfUser(@PathVariable Integer userId) {
 		return photoService.getAllPhotosOfUser(userId);
-	}	
+	}
 }

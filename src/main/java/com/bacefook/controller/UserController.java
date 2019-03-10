@@ -22,6 +22,7 @@ import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
 import com.bacefook.dto.UserInfoDTO;
 import com.bacefook.dto.UserSummaryDTO;
+import com.bacefook.exception.AlreadyContainsException;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
@@ -109,12 +110,12 @@ public class UserController {
 	}
 	
 	@PostMapping("/users/setup")
-	public Integer setUpProfile(@RequestBody UserInfoDTO infoDto,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+	public UserInfoDTO setUpProfile(@RequestBody UserInfoDTO infoDto,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException, AlreadyContainsException {
 		int userId = SessionManager.getLoggedUser(request);
-		UserInfo info = new UserInfo();
-		this.mapper.map(infoDto, info);
-		info.setId(userId);
-		return userService.save(info).getId();
+		if(userService.getInfoByPhone(infoDto.getPhone())!=null) {
+			throw new AlreadyContainsException("A user with that phone already exists");
+		}
+		return userService.save(infoDto,userId);
 	}
 
 }
