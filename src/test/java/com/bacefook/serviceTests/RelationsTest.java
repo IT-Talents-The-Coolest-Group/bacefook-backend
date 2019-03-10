@@ -17,6 +17,7 @@ import com.bacefook.model.Relation;
 import com.bacefook.repository.RelationsRepository;
 import com.bacefook.repository.UsersRepository;
 import com.bacefook.service.RelationService;
+import com.bacefook.service.UserService;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {
@@ -24,7 +25,8 @@ import com.bacefook.service.RelationService;
 		RelationsRepository.class, 
 		UserDAO.class, 
 		UsersRepository.class, 
-		RelationsDAO.class})
+		RelationsDAO.class,
+		UserService.class})
 public class RelationsTest {
 
 	@Autowired
@@ -37,6 +39,8 @@ public class RelationsTest {
 	private UsersRepository usersRepo;
 	@MockBean
 	private RelationsDAO relationsDao;
+	@MockBean
+	private UserService userService;
 
 	@Test(expected = RelationException.class)
 	public void sendRequestToYourselfTest() throws RelationException, ElementNotFoundException {
