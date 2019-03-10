@@ -36,12 +36,16 @@ public class RelationService {
 		int rows = relationsDAO.removeFromFriends(loggedId, friendId);
 		if (rows > 0) {
 			return "User id no longer friends with " + friendId;
-		} else {
-			return "User is not friends with "+friendId;
+		} 
+		else {
+			return "User is not friends with " + friendId;
 		}
 	}
+	
+
 	public Integer sendFriendRequest(Integer senderId, Integer receiverId)
 			throws RelationException, ElementNotFoundException {
+	
 		Relation friendRequest = new Relation(senderId, receiverId, 0);
 		if (senderId.equals(receiverId)) {
 			throw new RelationException("You cannot send a request to yourself!");
@@ -63,7 +67,7 @@ public class RelationService {
 		if (relation == null) {
 			throw new RelationException("You do not have a request from that user!");
 		}
-		if(relation.getIsConfirmed()==1) {
+		if(relation.getIsConfirmed().equals(1)) {
 			throw new RelationException("You are already friends!");
 		}
 		relation.setIsConfirmed(1);
@@ -109,20 +113,23 @@ public class RelationService {
 		return userDAO.findAllFriendsOf(userId).size();
 	}
 
-	public String cancelFriendRequest(Integer loggedId, Integer receiverId) {
+	public String cancelFriendRequest(Integer loggedId, Integer receiverId) throws RelationException {
 		int rows = relationsDAO.cancelFriendRequest(loggedId, receiverId);
 		if (rows > 0) {
 			return "You canceled a friend request to " + receiverId;
-		} else {
-			return "Sorry, but you have not sent a friend request to this user.";
+		} 
+		else {
+			throw new RelationException("Sorry, but you have not sent a friend request to this user.");
 		}
 	}
-	public String deleteFriendRequest(Integer loggedId, Integer senderId) {
+	
+	public String deleteFriendRequest(Integer loggedId, Integer senderId) throws RelationException {
 		int rows = relationsDAO.cancelFriendRequest(loggedId, senderId);
 		if (rows > 0) {
 			return "You deleted a friend request from " + senderId;
-		} else {
-			return "Sorry, but you have not received a friend request from this user.";
+		} 
+		else {
+			throw new RelationException("Sorry, but you have not received a friend request from this user.");
 		}
 	}
 }

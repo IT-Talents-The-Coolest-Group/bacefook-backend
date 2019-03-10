@@ -98,7 +98,8 @@ public class UserController {
 		if (SessionManager.isLogged(request)) {
 			String message = SessionManager.logOutUser(request);
 			return message;
-		} else {
+		} 
+		else {
 			throw new UnauthorizedException("You are not logged in!");
 		}
 	}

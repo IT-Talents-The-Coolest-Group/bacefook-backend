@@ -56,19 +56,25 @@ public class RelationsController {
 	}
 	
 	@DeleteMapping("/friends")
-	public String removeFromFriends(@RequestParam Integer friendId,HttpServletRequest request) throws UnauthorizedException {
+	public String removeFromFriends(@RequestParam Integer friendId,HttpServletRequest request) 
+			throws UnauthorizedException {
+	
 		int loggedId = SessionManager.getLoggedUser(request);
 		return relationService.removeFromFriends(loggedId, friendId);
 	}
 	
 	@DeleteMapping("/cancelrequests")
-	public String cancelFriendRequest(@RequestParam Integer receiverId,HttpServletRequest request) throws UnauthorizedException {
+	public String cancelFriendRequest(@RequestParam Integer receiverId,HttpServletRequest request) 
+			throws UnauthorizedException, RelationException {
+		
 		int loggedId = SessionManager.getLoggedUser(request);
 		return relationService.cancelFriendRequest(loggedId, receiverId);
 	}
 	
 	@DeleteMapping("/deleterequests")
-	public String deleteFriendRequest(@RequestParam Integer senderId,HttpServletRequest request) throws UnauthorizedException{
+	public String deleteFriendRequest(@RequestParam Integer senderId,HttpServletRequest request) 
+			throws UnauthorizedException, RelationException{
+		
 		int loggedId = SessionManager.getLoggedUser(request);
 		return relationService.deleteFriendRequest(loggedId, senderId);
 	}

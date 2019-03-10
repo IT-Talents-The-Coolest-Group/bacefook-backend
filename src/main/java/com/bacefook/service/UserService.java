@@ -154,6 +154,7 @@ public class UserService {
 		this.mapper.map(userInfo, dto);
 		return dto;
 	}
+	
 	public UserInfo findUserInfo(Integer userId) throws ElementNotFoundException {
 		if (userId == null) {
 			throw new ElementNotFoundException("User id must not be null!");

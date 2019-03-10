@@ -53,7 +53,7 @@ public class PhotoService {
 			Map response = cloudinary.uploader().upload(file, ObjectUtils.asMap("public_id", file.getName()));
 			String url = (String) response.get("url");
 
-			int postId = postsService.save(userId, "Photo");
+			int postId = postsService.save(userId, file.getName());
 			Post post = postsService.findById(postId);
 			Photo photo = photosRepo.save(new Photo(post.getId(), url));
 
