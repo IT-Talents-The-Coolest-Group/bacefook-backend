@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Cryptography {
+	
 	public static String cryptSHA256(String password) throws NoSuchAlgorithmException {
 
 		MessageDigest digest = MessageDigest.getInstance("SHA-256");

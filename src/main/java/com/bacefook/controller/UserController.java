@@ -79,16 +79,19 @@ public class UserController {
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException,
 			UnauthorizedException {
+		
 		if (!SessionManager.isLogged(request)) {
 			UserValidation.validate(login);
 			User user = userService.findByEmail(login.getEmail());
 			if (user.getPassword().equals(Cryptography.cryptSHA256(login.getPassword()))) {
 				SessionManager.signInUser(request, user);
 				return user.getId();
-			} else {
+			} 
+			else {
 				throw new InvalidUserCredentialsException("Wrong login credentials!");
 			}
-		} else {
+		} 
+		else {
 			throw new UnauthorizedException("Log out first before you log in!");
 		}
 	}

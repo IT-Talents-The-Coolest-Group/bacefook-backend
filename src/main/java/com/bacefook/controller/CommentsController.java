@@ -21,7 +21,6 @@ import com.bacefook.exception.AlreadyContainsException;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.Comment;
-import com.bacefook.model.User;
 import com.bacefook.service.CommentLikeService;
 import com.bacefook.service.CommentService;
 import com.bacefook.service.PostService;
@@ -65,8 +64,9 @@ public class CommentsController {
 	public void addReplyToComment(@RequestParam("commentId") Integer commentId,
 			@RequestBody CommentContentDTO commentContentDto, HttpServletRequest request)
 			throws UnauthorizedException, ElementNotFoundException {
-		User user = userService.findById(SessionManager.getLoggedUser(request));
-		commentsService.replyTo(user, commentId, commentContentDto);
+		
+		Integer userId = SessionManager.getLoggedUser(request);
+		commentsService.replyTo(userId, commentId, commentContentDto);
 	}
 
 	@PostMapping("/comments")
