@@ -120,6 +120,7 @@ public class CommentsController {
 			CommentDTO commentDto = new CommentDTO();
 			this.mapper.map(comment, commentDto);
 			commentDto.setPosterFullName(posterFullName);
+			commentDto.setComentedOnId(comment.getCommentedOnId());
 			commentsOnPost.add(commentDto);
 		}
 		return commentsOnPost;
