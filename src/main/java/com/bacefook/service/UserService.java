@@ -52,26 +52,30 @@ public class UserService {
 	
 	public String removeFromFriends(Integer loggedId,Integer friendId) {
 		int rows = relationsDAO.removeFromFriends(loggedId, friendId);
-		if(rows>0) {
-			return "You are no longer friends with "+friendId;
+		if(rows > 0) {
+			return "You are no longer friends with " + friendId;
 		}else {
 			return "Sorry, but you are not friends with such person.";
 		}
 	}
+	
 	public String cancelFriendRequest(Integer loggedId,Integer receiverId) {
 		int rows = relationsDAO.cancelFriendRequest(loggedId, receiverId);
-		if(rows>0) {
-			return "You canceled a friend request for "+receiverId;
-		}else {
-			return "Sorry, but you have not sent friend request for this user.";
+		if(rows > 0) {
+			return "You canceled a friend request to " + receiverId;
+		}
+		else {
+			return "Sorry, but you have not sent a friend request to this user.";
 		}
 	}
+	
 	public String deleteFriendRequest(Integer loggedId,Integer senderId) {
 		int rows = relationsDAO.cancelFriendRequest(loggedId, senderId);
-		if(rows>0) {
-			return "You deleted a friend request from "+senderId;
-		}else {
-			return "Sorry, but you have not received friend request from this user.";
+		if(rows > 0) {
+			return "You deleted a friend request from " + senderId;
+		}
+		else {
+			return "Sorry, but you have not received a friend request from this user.";
 		}
 	}
 	
@@ -82,7 +86,6 @@ public class UserService {
 		}
 		return url.get(0);
 	}
-	
 	
 	public User findByEmail(String email) throws ElementNotFoundException {
 		User user = usersRepo.findByEmail(email);
@@ -165,6 +168,7 @@ public class UserService {
 		
 		return users;
 	}
+	
 	/**
 	 * find all friends by user
 	 * **/
@@ -190,6 +194,7 @@ public class UserService {
 	public int getFriendsCountOF(Integer userId) {
 		return userDAO.findAllFriendsOf(userId).size();
 	}
+
 	/**
 	 * find search matches 
 	 * show them by Profile picture, Full name and Friends count
