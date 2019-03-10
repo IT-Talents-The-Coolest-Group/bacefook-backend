@@ -1,7 +1,5 @@
 package com.bacefook.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,11 +8,11 @@ import lombok.NonNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProfilePageDTO {
-	private NavigationBarDTO navBar;
-	private UserInfoDTO userInfo;
+public class UserInfoDTO {
 	@NonNull
-	private UserSummaryDTO user;
+	private Integer cityId;
+	private Integer profilePhotoId;
+	private Integer coverPhotoId;
 	@NonNull
-	private List<PostDTO> userPosts;
+	private String phone;
 }

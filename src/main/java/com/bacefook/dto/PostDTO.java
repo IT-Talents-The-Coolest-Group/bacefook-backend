@@ -13,9 +13,13 @@ import lombok.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostDTO {
+	
 	private Integer id;
+	
 	private String posterFullName;
+	
 	private Integer sharesPostId;
+	
 	@NonNull
 	private String content;
 	@NonNull

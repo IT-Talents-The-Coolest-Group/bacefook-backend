@@ -12,4 +12,6 @@ public interface PostLikesRepository extends JpaRepository<PostLike, Integer> {
 	
 	public List<PostLike> findAllByPostId(Integer postId);
 	
+	public PostLike findByUserIdAndPostId(Integer userId,Integer postId);
+	
 }

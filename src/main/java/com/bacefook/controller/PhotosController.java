@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,28 +21,23 @@ import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.exception.UnprocessableFileException;
 import com.bacefook.service.PhotoService;
 
+@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @RestController
 public class PhotosController {
 
 	@Autowired
 	private PhotoService photoService;
 
-	@PostMapping("/uploadphoto")
+	@PostMapping("photos/uploadphoto")
 	public PhotoDTO uploadPhoto(@RequestParam MultipartFile input, HttpServletRequest request, HttpServletResponse response)
-					throws UnprocessableFileException, UnauthorizedException {
+					throws UnprocessableFileException, UnauthorizedException, ElementNotFoundException {
 
 		Integer userId = SessionManager.getLoggedUser(request);
 		PhotoDTO photoDto = photoService.save(input, userId);
-//		try {
-//			response.sendRedirect(photoDto.getUrl());
-//		} 
-//		catch (IOException e) {
-//			throw new UnprocessableFileException("Could not open the photo, invalid url was generated..", e);
-//		}
 		return photoDto;
 	}
 	
-	@PutMapping("/profilephoto/{photoId}")
+	@PutMapping("/profilephotos/{photoId}")
 	public String updateProfilePhoto(@PathVariable Integer photoId, HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
 		
@@ -51,7 +47,7 @@ public class PhotosController {
 		return "You changed your profile photo succesfylly!";
 	}
 	
-	@PutMapping("/coverphoto/{photoId}")
+	@PutMapping("/coverphotos/{photoId}")
 	public void updateCoverPhoto(@PathVariable Integer photoId, HttpServletRequest request) 
 			throws UnauthorizedException, ElementNotFoundException {
 		
@@ -63,7 +59,5 @@ public class PhotosController {
 	@GetMapping("/users/{userId}/photos")
 	public List<PhotoDTO> getAllPhotosOfUser(@PathVariable Integer userId) {
 		return photoService.getAllPhotosOfUser(userId);
-	}
-	
-	
+	}	
 }

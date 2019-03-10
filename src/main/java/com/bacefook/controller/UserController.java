@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,22 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bacefook.dto.ChangePasswordDTO;
 import com.bacefook.dto.LoginDTO;
 import com.bacefook.dto.SignUpDTO;
+import com.bacefook.dto.UserInfoDTO;
 import com.bacefook.dto.UserSummaryDTO;
 import com.bacefook.exception.ElementNotFoundException;
 import com.bacefook.exception.InvalidUserCredentialsException;
 import com.bacefook.exception.UnauthorizedException;
 import com.bacefook.model.User;
+import com.bacefook.model.UserInfo;
 import com.bacefook.security.Cryptography;
 import com.bacefook.service.UserService;
 import com.bacefook.utility.UserValidation;
 
-//@CrossOrigin(origins = "http://bacefook.herokuapp.com")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://bacefook.herokuapp.com")
 @RestController
 public class UserController {
 
 	@Autowired
 	private UserService userService;
+	private ModelMapper mapper = new ModelMapper();
 
 	@GetMapping("/")
 	public void startingPage(HttpServletResponse response) throws IOException {
@@ -46,7 +49,6 @@ public class UserController {
 	public List<UserSummaryDTO> getAllUsersBySearch(@RequestParam String input,HttpServletRequest request) throws UnauthorizedException {
 		Integer userId = SessionManager.getLoggedUser(request);
 		List<UserSummaryDTO> users = userService.searchByNameOrderedAndLimited(input, userId);
-		System.out.println(users);
 		return users;
 	}
 
@@ -54,17 +56,15 @@ public class UserController {
 	public void changeUserPassword(@RequestBody ChangePasswordDTO passDto, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, UnauthorizedException,
 			ElementNotFoundException {
-
 		UserValidation.validate(passDto);
 		int userId = SessionManager.getLoggedUser(request);
 		userService.changePassword(userId, passDto.getOldPassword(), passDto.getNewPassword());
 	}
 
-	@PostMapping("/signup")
+	@PostMapping("/users/signup")
 	public Integer signUp(@RequestBody SignUpDTO signUp, HttpServletRequest request, HttpServletResponse response)
 			throws InvalidUserCredentialsException, ElementNotFoundException, NoSuchAlgorithmException,
 			UnauthorizedException, IOException {
-
 		UserValidation.validate(signUp);
 		if (SessionManager.isLogged(request)) {
 			throw new UnauthorizedException("Please log out before you can register!");
@@ -80,14 +80,13 @@ public class UserController {
 		return user.getId();
 	}
 
-	@PostMapping("/login")
+	@PostMapping("/users/login")
 	public Integer login(@RequestBody LoginDTO login, HttpServletRequest request)
 			throws InvalidUserCredentialsException, NoSuchAlgorithmException, ElementNotFoundException,
 			UnauthorizedException {
 		if (!SessionManager.isLogged(request)) {
 			UserValidation.validate(login);
 			User user = userService.findByEmail(login.getEmail());
-
 			if (user.getPassword().equals(Cryptography.cryptSHA256(login.getPassword()))) {
 				SessionManager.signInUser(request, user);
 				return user.getId();
@@ -99,7 +98,7 @@ public class UserController {
 		}
 	}
 
-	@PostMapping("/logout")
+	@PostMapping("/users/logout")
 	public String logout(HttpServletRequest request) throws UnauthorizedException {
 		if (SessionManager.isLogged(request)) {
 			String message = SessionManager.logOutUser(request);
@@ -107,6 +106,15 @@ public class UserController {
 		} else {
 			throw new UnauthorizedException("You are not logged in!");
 		}
+	}
+	
+	@PostMapping("/users/setup")
+	public Integer setUpProfile(@RequestBody UserInfoDTO infoDto,HttpServletRequest request) throws UnauthorizedException, ElementNotFoundException {
+		int userId = SessionManager.getLoggedUser(request);
+		UserInfo info = new UserInfo();
+		this.mapper.map(infoDto, info);
+		info.setId(userId);
+		return userService.save(info).getId();
 	}
 
 }
