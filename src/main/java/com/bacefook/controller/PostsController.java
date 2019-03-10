@@ -61,6 +61,9 @@ public class PostsController {
 
 		UserSummaryDTO user = new UserSummaryDTO();
 		mapper.map(loggedUser, user);
+		user.setProfilePhotoUrl(userService.findProfilePhotoUrl(loggedUser.getId()));
+		user.setFriendsCount(relationService.findAllFriendOf(userId).size());
+		
 		List<PostDTO> posts = postsService.findAllPostsFromFriends(userId);
 		HomePageDTO home = new HomePageDTO(navUser, user, posts);
 		return home;

@@ -13,6 +13,7 @@ public class ProfilePhotoDAO {
 			+ "LEFT JOIN photos p ON(info.profile_photo_id=p.id) WHERE info.id = ?;";
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	
 	public List<String> findProfilePhotoUrl(Integer userId) {
 		return jdbcTemplate.query(GET_PROFILE_PHOTO_URL_BY_USER, ps -> {
 			ps.setInt(1, userId);
